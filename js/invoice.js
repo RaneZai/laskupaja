@@ -100,7 +100,7 @@
       'print.bid': 'Y-tunnus',
       'print.thanks': 'Kiitos yhteistyöstä!',
       'print.disclaimer': 'Ei oikeudellista neuvontaa.',
-      'print.madeWith': 'Lasku laadittu Laskupajassa – ranezai.github.io/laskupaja',
+      'print.madeWith': 'Lasku laadittu Laskupajassa – laskupaja.com',
     },
     en: {
       'inv.title': 'Invoice generator',
@@ -181,7 +181,7 @@
       'print.bid': 'Business ID',
       'print.thanks': 'Thank you for your business!',
       'print.disclaimer': 'Not legal advice.',
-      'print.madeWith': 'Invoice made with Laskupaja – ranezai.github.io/laskupaja',
+      'print.madeWith': 'Invoice made with Laskupaja – laskupaja.com',
     },
   });
 

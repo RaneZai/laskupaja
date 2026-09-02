@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://ranezai.github.io/laskupaja/sitemap.xml
+Sitemap: https://laskupaja.com/sitemap.xml

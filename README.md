@@ -86,7 +86,7 @@ node tests/reference.test.js
    *Build command* empty and *Output directory* `/`.
 2. Add a custom domain when ready.
 
-**Before launch (both):** replace `ranezai.github.io/laskupaja` with the real domain in
+**Before launch (both):** replace `laskupaja.com` with the real domain in
 `index.html`, `lasku/index.html`, `alv/index.html` (canonical + `og:url` +
 `og:image`) and `sitemap.xml` + `robots.txt`.
 
