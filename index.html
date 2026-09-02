@@ -1,0 +1,159 @@
+<!doctype html>
+<!-- Laskupaja homepage. Domain placeholder: ranezai.github.io/laskupaja (update canonical/og:url/sitemap.xml when hosted). -->
+<html lang="fi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- SEO: FI primary -->
+  <title>Laskupaja – ilmainen laskutusohjelma, laskupohja ja ALV-laskuri 2026</title>
+  <meta name="description" content="Tee ammattimainen lasku PDF:ksi ilmaiseksi – suomeksi ja englanniksi. Laskupaja on ilmainen laskupohja ja ALV-laskuri (25,5 % / 13,5 % / 10 %), joka toimii suoraan selaimessa ilman rekisteröitymistä. Tiedot pysyvät koneellasi.">
+
+  <!-- SEO: EN secondary -->
+  <meta property="og:title" content="Laskupaja – Free Invoice Generator &amp; VAT Calculator (Finland)">
+  <meta property="og:description" content="Create a professional invoice as PDF, in Finnish or English. Correct 2026 VAT rates (25.5% / 13.5% / 10%), Finnish &amp; RF payment references, everything stays in your browser. No signup.">
+
+  <link rel="canonical" href="https://ranezai.github.io/laskupaja/">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ranezai.github.io/laskupaja/">
+  <meta property="og:image" content="https://ranezai.github.io/laskupaja/assets/og-cover.svg">
+  <meta property="og:site_name" content="Laskupaja">
+  <meta property="og:locale" content="fi_FI">
+  <meta property="og:locale:alternate" content="en_GB">
+  <meta name="theme-color" content="#1d4ed8">
+
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="stylesheet" href="css/style.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Laskupaja",
+    "alternateName": "Laskupaja – ilmainen laskutusohjelma",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Any",
+    "inLanguage": ["fi", "en"],
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+    "description": "Ilmainen laskupohja ja ALV-laskuri suomalaisille freelancerille ja pienyrityksille. Toimii selaimessa, ei rekisteröitymistä."
+  }
+  </script>
+
+  <script src="js/i18n.js" defer></script>
+  <script src="js/home.js" defer></script>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="./" aria-label="Laskupaja">
+        <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
+          <rect width="64" height="64" rx="14" fill="#1d4ed8"/>
+          <rect x="18" y="12" width="28" height="40" rx="3" fill="#fff"/>
+          <rect x="23" y="20" width="18" height="3" rx="1.5" fill="#c7d2fe"/>
+          <rect x="23" y="27" width="18" height="3" rx="1.5" fill="#c7d2fe"/>
+          <rect x="23" y="34" width="11" height="3" rx="1.5" fill="#c7d2fe"/>
+          <circle cx="42" cy="44" r="8" fill="#047857"/>
+          <text x="42" y="48.5" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#fff">€</text>
+        </svg>
+        Laskupaja
+      </a>
+      <nav class="main-nav" aria-label="Päävalikko">
+        <a class="nav-link active" href="./" data-i18n="nav.home"></a>
+        <a class="nav-link" href="lasku/" data-i18n="nav.invoice"></a>
+        <a class="nav-link" href="alv/" data-i18n="nav.vat"></a>
+      </nav>
+      <div class="lang-toggle" role="group" aria-label="Kieli / Language">
+        <button type="button" data-lang-toggle="fi" aria-pressed="true">FI</button>
+        <button type="button" data-lang-toggle="en" aria-pressed="false">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="hero">
+      <span class="badge-2026" data-i18n="home.badge"></span>
+      <h1 data-i18n="home.heroTitle"></h1>
+      <p class="lead" data-i18n="home.lead"></p>
+      <div class="actions-row">
+        <a class="btn btn-primary" href="lasku/" data-i18n="home.ctaInvoice"></a>
+        <a class="btn btn-secondary" href="alv/" data-i18n="home.ctaVat"></a>
+      </div>
+    </section>
+
+    <!-- MONETIZATION SLOT (hero-below): reserved for AdSense or affiliate banner.
+         Do NOT add code before there is real traffic — see README § Monetization. -->
+
+    <section class="tool-grid" aria-label="Työkalut">
+      <a class="card tool-card" href="lasku/">
+        <h3><span data-i18n="home.toolInvoiceTitle"></span> <span aria-hidden="true">🧾</span></h3>
+        <p data-i18n="home.toolInvoiceDesc"></p>
+        <span class="go" data-i18n="home.open"></span>
+      </a>
+      <a class="card tool-card" href="alv/">
+        <h3><span data-i18n="home.toolVatTitle"></span> <span aria-hidden="true">🧮</span></h3>
+        <p data-i18n="home.toolVatDesc"></p>
+        <span class="go" data-i18n="home.open"></span>
+      </a>
+    </section>
+
+    <!-- MONETIZATION SLOT ("kokeile myös"): future affiliate section for accounting
+         tools (Holvi, UKKO, SimplBooks, …). Add only after traffic — see README § Monetization. -->
+
+    <section aria-labelledby="why-title">
+      <h2 id="why-title" data-i18n="home.whyTitle"></h2>
+      <ul class="features">
+        <li><strong><span class="icon" aria-hidden="true">🇫🇮</span><span data-i18n="home.f1t"></span></strong>
+          <span data-i18n="home.f1d"></span></li>
+        <li><strong><span class="icon" aria-hidden="true">🌍</span><span data-i18n="home.f2t"></span></strong>
+          <span data-i18n="home.f2d"></span></li>
+        <li><strong><span class="icon" aria-hidden="true">✨</span><span data-i18n="home.f3t"></span></strong>
+          <span data-i18n="home.f3d"></span></li>
+        <li><strong><span class="icon" aria-hidden="true">🔒</span><span data-i18n="home.f4t"></span></strong>
+          <span data-i18n="home.f4d"></span></li>
+        <li><strong><span class="icon" aria-hidden="true">🧮</span><span data-i18n="home.f5t"></span></strong>
+          <span data-i18n="home.f5d"></span></li>
+      </ul>
+    </section>
+
+    <section class="faq" aria-labelledby="faq-title">
+      <h2 id="faq-title" data-i18n="home.faqTitle"></h2>
+      <details>
+        <summary data-i18n="home.q1"></summary>
+        <p data-i18n="home.a1"></p>
+      </details>
+      <details>
+        <summary data-i18n="home.q2"></summary>
+        <p data-i18n="home.a2"></p>
+      </details>
+      <details>
+        <summary data-i18n="home.q3"></summary>
+        <p><span data-i18n="home.a3"></span>
+          <a href="https://www.vero.fi/yritykset-ja-yhteisot/verot-ja-maksut/arvonlisaverotus/arvonlisaveroprosentit/" target="_blank" rel="noopener">vero.fi</a>.</p>
+      </details>
+      <details>
+        <summary data-i18n="home.q4"></summary>
+        <p data-i18n="home.a4"></p>
+      </details>
+    </section>
+
+    <section class="notice" aria-label="Yksityisyys">
+      <strong data-i18n="home.privacyTitle"></strong>
+      <span data-i18n="home.privacyText"></span>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span data-i18n="footer.disclaimer"></span>
+      <span>
+        <a href="https://www.vero.fi/tietoa-verohallinnosta/uutishuone/verotuksen_muutoksia/alv-kannan-aleneminen/" target="_blank" rel="noopener" data-i18n="footer.sources"></a>
+      </span>
+      <span data-i18n="footer.privacy"></span>
+    </div>
+  </footer>
+
+</body>
+</html>

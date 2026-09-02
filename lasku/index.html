@@ -1,0 +1,232 @@
+<!doctype html>
+<!-- Laskupaja invoice generator. Domain placeholder: ranezai.github.io/laskupaja (update canonical/og:url when hosted). -->
+<html lang="fi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- SEO: FI primary -->
+  <title>Ilmainen laskupohja – tee lasku ja tallenna PDF:nä | Laskupaja</title>
+  <meta name="description" content="Tee lasku ilmaiseksi: laskurivit, ALV 25,5 % / 13,5 % / 10 %, viitenumero ja eräpäivä. Tulosta lasku PDF:ksi suoraan selaimesta – ei rekisteröitymistä, suomeksi ja englanniksi.">
+
+  <!-- SEO: EN secondary -->
+  <meta property="og:title" content="Free Invoice Generator – print or save as PDF | Laskupaja">
+  <meta property="og:description" content="Create a professional Finnish invoice in your browser: line items, 2026 VAT rates, Finnish &amp; RF payment references, A4 printout. No signup, FI/EN.">
+
+  <link rel="canonical" href="https://ranezai.github.io/laskupaja/lasku/">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ranezai.github.io/laskupaja/lasku/">
+  <meta property="og:image" content="https://ranezai.github.io/laskupaja/assets/og-cover.svg">
+  <meta property="og:site_name" content="Laskupaja">
+  <meta property="og:locale" content="fi_FI">
+  <meta property="og:locale:alternate" content="en_GB">
+  <meta name="theme-color" content="#1d4ed8">
+
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="stylesheet" href="../css/style.css">
+
+  <!--
+    VAT rates 2026 (verified 2026-09-02):
+    - general 25.5%: https://www.vero.fi/yritykset-ja-yhteisot/verot-ja-maksut/arvonlisaverotus/arvonlisaveroprosentit/
+    - reduced 13.5% from 1.1.2026 (previously 14%): https://www.vero.fi/tietoa-verohallinnosta/uutishuone/verotuksen_muutoksia/alv-kannan-aleneminen/
+  -->
+
+  <script src="../js/reference.js" defer></script>
+  <script src="../js/i18n.js" defer></script>
+  <script src="../js/invoice.js" defer></script>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="../" aria-label="Laskupaja">
+        <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
+          <rect width="64" height="64" rx="14" fill="#1d4ed8"/>
+          <rect x="18" y="12" width="28" height="40" rx="3" fill="#fff"/>
+          <rect x="23" y="20" width="18" height="3" rx="1.5" fill="#c7d2fe"/>
+          <rect x="23" y="27" width="18" height="3" rx="1.5" fill="#c7d2fe"/>
+          <rect x="23" y="34" width="11" height="3" rx="1.5" fill="#c7d2fe"/>
+          <circle cx="42" cy="44" r="8" fill="#047857"/>
+          <text x="42" y="48.5" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#fff">€</text>
+        </svg>
+        Laskupaja
+      </a>
+      <nav class="main-nav" aria-label="Päävalikko">
+        <a class="nav-link" href="../" data-i18n="nav.home"></a>
+        <a class="nav-link active" href="./" data-i18n="nav.invoice"></a>
+        <a class="nav-link" href="../alv/" data-i18n="nav.vat"></a>
+      </nav>
+      <div class="lang-toggle" role="group" aria-label="Kieli / Language">
+        <button type="button" data-lang-toggle="fi" aria-pressed="true">FI</button>
+        <button type="button" data-lang-toggle="en" aria-pressed="false">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container narrow">
+    <h1 id="page-title" data-i18n="inv.title"></h1>
+    <p class="lead" data-i18n="inv.lead" style="color: var(--muted); margin-top: -0.5rem;"></p>
+
+    <form id="invoice-form" autocomplete="off" novalidate>
+
+      <!-- Laskuttaja / Sender -->
+      <section class="card">
+        <h2 data-i18n="inv.sender"></h2>
+        <div class="grid-2">
+          <div class="field">
+            <label for="senderName" data-i18n="inv.senderName"></label>
+            <input type="text" id="senderName" data-i18n-placeholder="inv.namePh">
+          </div>
+          <div class="field">
+            <label for="senderBid" data-i18n="inv.senderBid"></label>
+            <input type="text" id="senderBid" placeholder="1234567-8">
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="senderAddress" data-i18n="inv.address"></label>
+            <textarea id="senderAddress" rows="2"></textarea>
+          </div>
+          <div class="field">
+            <label for="senderIban" data-i18n="inv.iban"></label>
+            <input type="text" id="senderIban" placeholder="FI21 1234 5600 0007 85">
+          </div>
+        </div>
+      </section>
+
+      <!-- Asiakas / Client -->
+      <section class="card">
+        <h2 data-i18n="inv.client"></h2>
+        <div class="grid-2">
+          <div class="field">
+            <label for="clientName" data-i18n="inv.clientName"></label>
+            <input type="text" id="clientName" data-i18n-placeholder="inv.namePh">
+          </div>
+          <div class="field">
+            <label for="clientBid" data-i18n="inv.clientBid"></label>
+            <input type="text" id="clientBid" placeholder="1234567-8">
+          </div>
+        </div>
+        <div class="field">
+          <label for="clientAddress" data-i18n="inv.address"></label>
+          <textarea id="clientAddress" rows="2"></textarea>
+        </div>
+      </section>
+
+      <!-- Laskun tiedot / Invoice details -->
+      <section class="card">
+        <h2 data-i18n="inv.details"></h2>
+        <div class="grid-2">
+          <div class="field">
+            <label for="invoiceNumber" data-i18n="inv.number"></label>
+            <input type="text" id="invoiceNumber" inputmode="numeric" placeholder="2026001">
+          </div>
+          <div class="field">
+            <label for="invoiceDate" data-i18n="inv.date"></label>
+            <input type="date" id="invoiceDate" required>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="paymentTerms" data-i18n="inv.terms"></label>
+            <input type="number" id="paymentTerms" min="0" max="365" step="1" value="14">
+          </div>
+          <div class="field">
+            <label for="dueDate" data-i18n="inv.due"></label>
+            <input type="date" id="dueDate" required>
+          </div>
+        </div>
+        <div class="checkbox-field">
+          <input type="checkbox" id="pricesInclVat">
+          <label for="pricesInclVat" data-i18n="inv.pricesIncl"></label>
+        </div>
+        <p class="hint" data-i18n="inv.pricesInclHint"></p>
+      </section>
+
+      <!-- Laskurivit / Line items -->
+      <section class="card">
+        <h2 data-i18n="inv.items"></h2>
+        <div class="table-wrap">
+          <table class="items" id="items-table">
+            <thead>
+              <tr>
+                <th class="col-desc" scope="col" data-i18n="inv.desc"></th>
+                <th scope="col" data-i18n="inv.qty"></th>
+                <th scope="col" data-i18n="inv.unit"></th>
+                <th scope="col" data-i18n="inv.unitPrice"></th>
+                <th scope="col" data-i18n="inv.vatCol"></th>
+                <th scope="col" data-i18n="inv.sum"></th>
+                <th scope="col"><span class="visually-hidden" data-i18n="inv.removeRow"></span></th>
+              </tr>
+            </thead>
+            <tbody id="items-body"><!-- rows rendered by js/invoice.js --></tbody>
+          </table>
+        </div>
+        <datalist id="unit-list">
+          <option value="kpl"></option><option value="h"></option><option value="pv"></option>
+          <option value="kk"></option><option value="km"></option><option value="kg"></option>
+          <option value="l"></option><option value="m"></option><option value="m²"></option>
+          <option value="erä"></option><option value="%"></option>
+        </datalist>
+        <button type="button" class="btn btn-secondary btn-sm" id="add-row" data-i18n="inv.addRow"></button>
+      </section>
+
+      <!-- Yhteenveto / Totals -->
+      <section class="card">
+        <h2 data-i18n="inv.totals"></h2>
+        <div id="totals"><!-- rendered by js/invoice.js --></div>
+      </section>
+
+      <!-- Viitenumero / Payment reference -->
+      <section class="card">
+        <h2 data-i18n="inv.ref"></h2>
+        <div class="ref-grid">
+          <div class="ref-box">
+            <h3 data-i18n="inv.refNational"></h3>
+            <span class="mono" id="ref-national-value">—</span>
+            <p class="hint" data-i18n="inv.refNationalHint"></p>
+            <button type="button" class="btn btn-secondary btn-sm copy-btn" data-copy="ref-national-value" data-i18n="common.copy"></button>
+          </div>
+          <div class="ref-box">
+            <h3 data-i18n="inv.refRF"></h3>
+            <span class="mono" id="ref-rf-value">—</span>
+            <p class="hint" data-i18n="inv.refRFHint"></p>
+            <button type="button" class="btn btn-secondary btn-sm copy-btn" data-copy="ref-rf-value" data-i18n="common.copy"></button>
+          </div>
+        </div>
+        <p class="hint" data-i18n="inv.refHint" style="margin-top:0.8rem;"></p>
+        <div class="inline-row" style="margin-top:0.5rem;">
+          <input type="text" id="ref-check-input" data-i18n-placeholder="inv.refCheckPh" data-i18n-aria="inv.refCheckLabel">
+          <button type="button" class="btn btn-secondary btn-sm" id="ref-check-btn" data-i18n="inv.refCheckBtn"></button>
+          <span id="ref-check-result" aria-live="polite"></span>
+        </div>
+      </section>
+
+      <!-- MONETIZATION SLOT (below-tools): reserved for affiliate links ("kokeile myös").
+           See README § Monetization. -->
+
+      <div class="actions-row">
+        <button type="button" class="btn btn-primary" id="print-btn">
+          <span data-i18n="inv.print"></span> <kbd>Ctrl+P</kbd>
+        </button>
+        <button type="button" class="btn btn-secondary" id="new-invoice-btn" data-i18n="inv.new"></button>
+        <span class="autosave-note" id="autosave-note" data-i18n="inv.autosave"></span>
+      </div>
+    </form>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span data-i18n="footer.disclaimer"></span>
+      <span>
+        <a href="https://www.vero.fi/yritykset-ja-yhteisot/verot-ja-maksut/arvonlisaverotus/arvonlisaveroprosentit/" target="_blank" rel="noopener" data-i18n="footer.sources"></a>
+      </span>
+      <span data-i18n="footer.privacy"></span>
+    </div>
+  </footer>
+
+  <!-- Print-only A4 invoice, populated by js/invoice.js before printing. -->
+  <div id="print-view" aria-hidden="true"></div>
+
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!doctype html>
+<!-- Laskupaja ALV calculator. Domain placeholder: ranezai.github.io/laskupaja (update canonical/og:url when hosted). -->
+<html lang="fi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- SEO: FI primary -->
+  <title>ALV-laskuri 2026 – laske alv 25,5 % ja 13,5 % | Laskupaja</title>
+  <meta name="description" content="Laske arvonlisävero helposti: lisää ALV nettohintaan tai erota se brutosta. Voimassa olevat ALV-kannat 2026 – yleinen 25,5 %, alennettu 13,5 % (1.1.2026 alkaen, aiemmin 14 %) ja 10 %. Ilmainen, toimii selaimessa.">
+
+  <!-- SEO: EN secondary -->
+  <meta property="og:title" content="VAT Calculator 2026 (Finland) – 25.5%, 13.5%, 10% | Laskupaja">
+  <meta property="og:description" content="Add or remove Finnish VAT instantly. Current 2026 rates: general 25.5%, reduced 13.5% (from 1 Jan 2026, previously 14%) and 10%. Free, runs in your browser.">
+
+  <link rel="canonical" href="https://ranezai.github.io/laskupaja/alv/">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ranezai.github.io/laskupaja/alv/">
+  <meta property="og:image" content="https://ranezai.github.io/laskupaja/assets/og-cover.svg">
+  <meta property="og:site_name" content="Laskupaja">
+  <meta property="og:locale" content="fi_FI">
+  <meta property="og:locale:alternate" content="en_GB">
+  <meta name="theme-color" content="#1d4ed8">
+
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="stylesheet" href="../css/style.css">
+
+  <!--
+    2026 rate change: reduced VAT 14% -> 13.5% on 1.1.2026.
+    Sources (verified 2026-09-02):
+    - https://www.vero.fi/tietoa-verohallinnosta/uutishuone/verotuksen_muutoksia/alv-kannan-aleneminen/
+    - https://www.vero.fi/yritykset-ja-yhteisot/verot-ja-maksut/arvonlisaverotus/arvonlisaveroprosentit/
+  -->
+
+  <script src="../js/i18n.js" defer></script>
+  <script src="../js/calculator.js" defer></script>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="../" aria-label="Laskupaja">
+        <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
+          <rect width="64" height="64" rx="14" fill="#1d4ed8"/>
+          <rect x="18" y="12" width="28" height="40" rx="3" fill="#fff"/>
+          <rect x="23" y="20" width="18" height="3" rx="1.5" fill="#c7d2fe"/>
+          <rect x="23" y="27" width="18" height="3" rx="1.5" fill="#c7d2fe"/>
+          <rect x="23" y="34" width="11" height="3" rx="1.5" fill="#c7d2fe"/>
+          <circle cx="42" cy="44" r="8" fill="#047857"/>
+          <text x="42" y="48.5" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#fff">€</text>
+        </svg>
+        Laskupaja
+      </a>
+      <nav class="main-nav" aria-label="Päävalikko">
+        <a class="nav-link" href="../" data-i18n="nav.home"></a>
+        <a class="nav-link" href="../lasku/" data-i18n="nav.invoice"></a>
+        <a class="nav-link active" href="./" data-i18n="nav.vat"></a>
+      </nav>
+      <div class="lang-toggle" role="group" aria-label="Kieli / Language">
+        <button type="button" data-lang-toggle="fi" aria-pressed="true">FI</button>
+        <button type="button" data-lang-toggle="en" aria-pressed="false">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container narrow">
+    <h1 id="page-title" data-i18n="calc.title"></h1>
+    <p class="lead" data-i18n="calc.lead" style="color: var(--muted); margin-top: -0.5rem;"></p>
+
+    <section class="card">
+      <div class="grid-2">
+        <div class="field">
+          <label for="calc-amount" data-i18n="calc.amount"></label>
+          <input type="text" id="calc-amount" inputmode="decimal" placeholder="1000" autocomplete="off">
+        </div>
+        <div class="field">
+          <span class="label-like" data-i18n="calc.dir"></span>
+          <div class="seg" role="group" aria-label data-i18n-aria="calc.dir">
+            <button type="button" id="dir-add" class="active" data-i18n="calc.dirAdd"></button>
+            <button type="button" id="dir-remove" data-i18n="calc.dirRemove"></button>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <span class="label-like" data-i18n="calc.rate"></span>
+        <div class="seg" id="rate-seg" role="group" aria-label data-i18n-aria="calc.rate">
+          <button type="button" data-rate="25.5" class="active">25,5 %</button>
+          <button type="button" data-rate="13.5">13,5 %</button>
+          <button type="button" data-rate="10">10 %</button>
+          <button type="button" data-rate="0">0 %</button>
+          <button type="button" data-rate="custom" data-i18n="calc.custom"></button>
+        </div>
+      </div>
+      <div class="field" id="custom-rate-field" hidden>
+        <label for="calc-custom-rate" data-i18n="calc.customLabel"></label>
+        <input type="text" id="calc-custom-rate" inputmode="decimal" placeholder="esim. 12">
+      </div>
+    </section>
+
+    <section class="card result-card">
+      <h2 data-i18n="calc.results"></h2>
+      <div class="result-grid">
+        <div class="result-item" id="res-net">
+          <div class="label" data-i18n="calc.net"></div>
+          <div class="value">0,00 €</div>
+        </div>
+        <div class="result-item" id="res-vat">
+          <div class="label" data-i18n="calc.vatPart"></div>
+          <div class="value">0,00 €</div>
+        </div>
+        <div class="result-item main" id="res-gross">
+          <div class="label" data-i18n="calc.gross"></div>
+          <div class="value">0,00 €</div>
+        </div>
+      </div>
+      <p class="hint" id="calc-formula"></p>
+    </section>
+
+    <!-- MONETIZATION SLOT (below-calculator): reserved for affiliate links.
+         See README § Monetization. -->
+
+    <section class="notice" aria-labelledby="change-title">
+      <h2 id="change-title" style="margin:0 0 0.4rem; font-size:1rem;" data-i18n="calc.infoTitle"></h2>
+      <p style="margin:0 0 0.3rem;"><span data-i18n="calc.infoText1"></span>
+        <a href="https://www.vero.fi/tietoa-verohallinnosta/uutishuone/verotuksen_muutoksia/alv-kannan-aleneminen/" target="_blank" rel="noopener" data-i18n="calc.infoLink1"></a><span data-i18n="calc.infoText2"></span>
+      </p>
+      <p style="margin:0;"><span data-i18n="calc.infoText3"></span>
+        <a href="https://www.vero.fi/yritykset-ja-yhteisot/verot-ja-maksut/arvonlisaverotus/arvonlisaveroprosentit/" target="_blank" rel="noopener" data-i18n="calc.infoLink2"></a>.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2 data-i18n="calc.ratesTitle"></h2>
+      <div class="table-wrap">
+        <table class="rate-table">
+          <thead>
+            <tr>
+              <th scope="col" data-i18n="calc.tableRate"></th>
+              <th scope="col" data-i18n="calc.tableApplies"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>25,5 %</strong></td><td data-i18n="calc.tGeneral"></td></tr>
+            <tr><td><strong>13,5 %</strong></td><td data-i18n="calc.tReduced"></td></tr>
+            <tr><td><strong>10 %</strong></td><td data-i18n="calc.tTen"></td></tr>
+            <tr><td><strong>0 %</strong></td><td data-i18n="calc.tZero"></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="hint"><span data-i18n="calc.tableNote"></span>
+        <a href="https://www.vero.fi/yritykset-ja-yhteisot/verot-ja-maksut/arvonlisaverotus/arvonlisaveroprosentit/" target="_blank" rel="noopener">vero.fi</a>.
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span data-i18n="footer.disclaimer"></span>
+      <span>
+        <a href="https://www.vero.fi/tietoa-verohallinnosta/uutishuone/verotuksen_muutoksia/alv-kannan-aleneminen/" target="_blank" rel="noopener" data-i18n="footer.sources"></a>
+      </span>
+      <span data-i18n="footer.privacy"></span>
+    </div>
+  </footer>
+
+</body>
+</html>
