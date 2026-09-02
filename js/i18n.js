@@ -15,6 +15,12 @@
 
   const LP = (window.LP = window.LP || {});
   const STORAGE_KEY = 'laskupaja:lang';
+  /* NOTE: the language choice (laskupaja:lang) is a non-personal UI setting,
+   * not user data. It intentionally keeps persisting even when the user opts
+   * out of data storage on the invoice page ("Remember my details" = off):
+   * that opt-out wipes personal data keys only (see LS_DATA_KEYS in
+   * js/invoice.js), and the spec explicitly allows the language preference
+   * to survive the wipe. */
 
   /* Shared strings used by every page. */
   const SHARED = {

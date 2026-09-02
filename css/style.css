@@ -569,6 +569,43 @@ table.items select:focus { border-color: var(--accent); background: #fff; }
 
 .notice a { color: var(--ok); font-weight: 600; }
 
+.notice p { margin: 0.15rem 0; }
+
+/* ---------- Storage transparency box (invoice page) ---------- */
+
+.storage-box {
+  background: var(--accent-soft);
+  border: 1px solid #c9d7f7;
+  border-radius: var(--radius);
+  padding: 0.9rem 1rem 0.75rem;
+  margin-bottom: 1rem;
+  font-size: 0.92rem;
+}
+
+.storage-box > p { margin: 0; }
+
+.storage-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+  margin-top: 0.55rem;
+}
+
+.storage-controls .checkbox-field { margin: 0; }
+
+.storage-box .storage-status {
+  min-height: 1.1em;
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin: 0.45rem 0 0;
+}
+
+.storage-box.off { background: var(--bg); border-color: var(--line); }
+
+/* Hint directly under a card heading (invoice page "My details") */
+.card > .card-hint { margin: -0.6rem 0 0.9rem; }
+
 /* ---------- Footer ---------- */
 
 .site-footer {
@@ -654,6 +691,12 @@ table.items select:focus { border-color: var(--accent); background: #fff; }
   #print-view .num { text-align: right; font-variant-numeric: tabular-nums; }
 
   #print-view .pv-totals { width: 70pt; margin-left: auto; }
+
+  #print-view .pv-notes {
+    margin: 0 0 12pt;
+    font-size: 10pt;
+    white-space: pre-line;
+  }
 
   #print-view .pv-totals td { border: 0; padding: 3pt 5pt; }
 

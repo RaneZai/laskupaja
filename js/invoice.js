@@ -3,7 +3,11 @@
  *  - line items with per-line VAT (2026 rates, see lasku/index.html head)
  *  - totals with VAT breakdown by rate
  *  - national + RF payment references (js/reference.js)
- *  - draft autosave to localStorage, next invoice number suggestion
+ *  - invoice numbering: prefix/padding-preserving increment (js/numbering.js)
+ *  - persistent business profile ("Omat tiedot"), stored in localStorage
+ *    SEPARATELY from the per-invoice draft
+ *  - draft autosave to localStorage, only while "remember my details" is on
+ *  - storage opt-out: wipes every data key and stops persisting entirely
  *  - A4 print view built before every print
  *
  * VAT rates 2026 (verified 2026-09-02):
@@ -16,6 +20,7 @@
 
   const LP = window.LP;
   const Viite = window.Viite;
+  const Numbering = window.LP.numbering;
   const t = (k) => LP.i18n.t(k);
 
   /* ---------- i18n: page strings ---------- */
@@ -24,12 +29,15 @@
     fi: {
       'inv.title': 'Laskun laatija',
       'inv.lead': 'Täytä tiedot, tarkista yhteenveto ja tulosta lasku A4-PDF:nä. Luonnos tallentuu automaattisesti selaimeen.',
-      'inv.sender': 'Laskuttaja',
+      'inv.myDetails': 'Omat tiedot – laskuttaja',
+      'inv.myDetailsHint': 'Nämä tiedot tallennetaan selaimen muistiin ja esitäytetään tuleviin laskuihin.',
       'inv.senderName': 'Nimi tai yritys *',
       'inv.namePh': 'esim. Matti Meikäläinen / Meikäläinen Oy',
       'inv.senderBid': 'Y-tunnus',
       'inv.address': 'Osoite',
       'inv.iban': 'IBAN-tilinumero',
+      'inv.defaultTerms': 'Oletusmaksuaika (päivää)',
+      'inv.defaultVat': 'Oletus ALV-% uusille riveille',
       'inv.client': 'Asiakas',
       'inv.clientName': 'Nimi tai yritys *',
       'inv.clientBid': 'Y-tunnus (valinnainen)',
@@ -40,6 +48,8 @@
       'inv.due': 'Eräpäivä',
       'inv.pricesIncl': 'Syötetyt yksikköhinnat sisältävät ALV:n',
       'inv.pricesInclHint': 'Jos rasti ei ole päällä, hinnat tulkitaan verottomiksi ja ALV lisätään päälle.',
+      'inv.notes': 'Viesti laskulle (valinnainen)',
+      'inv.notesPh': 'esim. Kiitos tilauksesta!',
       'inv.items': 'Laskurivit',
       'inv.desc': 'Kuvaus',
       'inv.descPh': 'esim. Verkkosivujen suunnittelu',
@@ -73,9 +83,17 @@
       'inv.refUnknown': '✗ Tuntematon muoto',
       'inv.new': 'Uusi lasku',
       'inv.print': 'Tulosta / Tallenna PDF',
-      'inv.confirmNew': 'Luodaanko uusi lasku? Nykyinen luonnos tyhjennetään (laskunumero kasvatetaan).',
+      'inv.confirmNew': 'Luodaanko uusi lasku? Asiakas, rivit ja viesti tyhjennetään – omat tiedot säilyvät ja laskunumero kasvatetaan.',
       'inv.autosave': 'Luonnos tallentuu automaattisesti selaimeen.',
       'inv.savedAt': 'Tallennettu',
+      'inv.storageTitle': 'Tietojen tallennus',
+      'inv.storageInfo': 'Tiedot tallennetaan vain selaimeesi (localStorage) — niitä ei lähetetä mihinkään palvelimelle.',
+      'inv.remember': 'Muista tietoni tällä laitteella',
+      'inv.clearSaved': 'Tyhjennä tallennetut tiedot',
+      'inv.confirmClear': 'Tyhjennetäänkö kaikki tallennetut tiedot (luonnos ja omat tiedot)? Tätä ei voi kumota.',
+      'inv.confirmRememberOff': 'Poistetaanko tietojen muistaminen käytöstä? Kaikki tallennetut tiedot pyyhkitään selaimen muistista.',
+      'inv.storageOff': 'Tietoja ei tallenneta – muistaminen on pois päältä.',
+      'inv.cleared': 'Tallennetut tiedot tyhjennetty.',
       'print.title': 'LASKU',
       'print.number': 'Laskunumero',
       'print.date': 'Laskupäivä',
@@ -105,12 +123,15 @@
     en: {
       'inv.title': 'Invoice generator',
       'inv.lead': 'Fill in the details, check the summary and print the invoice as an A4 PDF. The draft autosaves in your browser.',
-      'inv.sender': 'Seller',
+      'inv.myDetails': 'My details – seller',
+      'inv.myDetailsHint': 'These details are saved in your browser and prefilled into future invoices.',
       'inv.senderName': 'Name or company *',
       'inv.namePh': 'e.g. Jane Doe / Doe Ltd',
       'inv.senderBid': 'Business ID (Y-tunnus)',
       'inv.address': 'Address',
       'inv.iban': 'IBAN account number',
+      'inv.defaultTerms': 'Default payment terms (days)',
+      'inv.defaultVat': 'Default VAT % for new rows',
       'inv.client': 'Client',
       'inv.clientName': 'Name or company *',
       'inv.clientBid': 'Business ID (optional)',
@@ -121,6 +142,8 @@
       'inv.due': 'Due date',
       'inv.pricesIncl': 'Entered unit prices include VAT',
       'inv.pricesInclHint': 'If unchecked, prices are treated as net (excl. VAT) and VAT is added on top.',
+      'inv.notes': 'Message on the invoice (optional)',
+      'inv.notesPh': 'e.g. Thank you for your order!',
       'inv.items': 'Line items',
       'inv.desc': 'Description',
       'inv.descPh': 'e.g. Website design',
@@ -154,9 +177,17 @@
       'inv.refUnknown': '✗ Unknown format',
       'inv.new': 'New invoice',
       'inv.print': 'Print / Save as PDF',
-      'inv.confirmNew': 'Create a new invoice? The current draft will be cleared (number incremented).',
+      'inv.confirmNew': 'Create a new invoice? Client, rows and message will be cleared – your details stay and the number is incremented.',
       'inv.autosave': 'The draft autosaves to your browser.',
       'inv.savedAt': 'Saved',
+      'inv.storageTitle': 'Data storage',
+      'inv.storageInfo': 'Your details are stored only in your browser — nothing is ever sent to any server.',
+      'inv.remember': 'Remember my details on this device',
+      'inv.clearSaved': 'Clear saved data',
+      'inv.confirmClear': 'Clear all saved data (draft and your details)? This cannot be undone.',
+      'inv.confirmRememberOff': 'Turn off remembering? All saved data will be wiped from your browser.',
+      'inv.storageOff': 'Nothing is being saved — remembering is off.',
+      'inv.cleared': 'Saved data cleared.',
       'print.title': 'INVOICE',
       'print.number': 'Invoice no.',
       'print.date': 'Invoice date',
@@ -196,6 +227,14 @@
 
   const LS_DRAFT = 'laskupaja:draft';
   const LS_LAST_NO = 'laskupaja:lastInvoiceNo';
+  const LS_PROFILE = 'laskupaja:profile';   /* business profile, separate from the draft */
+  const LS_REMEMBER = 'laskupaja:remember'; /* '0' = opted out; absent = on (default) */
+  /* Data keys wiped by the storage opt-out and the "Clear saved data" button.
+   * laskupaja:lang (js/i18n.js) is deliberately NOT wiped: language is a
+   * non-personal UI preference, not user data, and per spec it may persist
+   * even when remember=off. The remember flag itself is also a setting – the
+   * opt-out writes '0' to it so the choice survives reloads. */
+  const LS_DATA_KEYS = [LS_DRAFT, LS_LAST_NO, LS_PROFILE];
   const DEFAULT_TERMS = 14;
 
   const $ = (sel) => document.querySelector(sel);
@@ -255,12 +294,51 @@
     try { localStorage.removeItem(key); } catch (e) { /* noop */ }
   }
 
+  /* ---------- storage opt-out ---------- */
+
+  /* Remembering is ON by default; only an explicit '0' opts out. */
+  function rememberOn() {
+    return lsGet(LS_REMEMBER) !== '0';
+  }
+
+  /* Wipe every data key the app writes (draft, last number, profile). */
+  function wipeStoredData() {
+    LS_DATA_KEYS.forEach(lsDel);
+  }
+
+  /* Status line inside the storage box (aria-live). */
+  function setStorageStatus(msg) {
+    const el = $('#storage-status');
+    if (el) el.textContent = msg || '';
+  }
+
+  /* Sync checkbox, box look and status line with the remember setting. */
+  function refreshStorageUI() {
+    const on = rememberOn();
+    $('#rememberMe').checked = on;
+    const box = $('#storage-box');
+    if (box) box.classList.toggle('off', !on);
+    setStorageStatus(on ? '' : t('inv.storageOff'));
+    if (!on) $('#autosave-note').textContent = t('inv.storageOff');
+  }
+
   /* ---------- line rows ---------- */
 
   function vatSelectHTML(selected) {
     return VAT_OPTIONS.map(
       (o) => `<option value="${o.value}"${o.value === selected ? ' selected' : ''} data-i18n="${o.key}"></option>`
     ).join('');
+  }
+
+  /* Current profile defaults (fallbacks match the HTML defaults). */
+  function defaultTerms() {
+    const n = parseInt($('#profileTerms').value, 10);
+    return isNaN(n) ? DEFAULT_TERMS : n;
+  }
+
+  function defaultVat() {
+    const el = $('#profileVat');
+    return (el && el.value) || '25.5';
   }
 
   function addRow(item) {
@@ -272,7 +350,7 @@
       `<td data-i18n-label="inv.qty"><input type="text" inputmode="decimal" class="ri-qty" value="${esc(item_.qty != null ? item_.qty : 1)}"></td>`,
       `<td data-i18n-label="inv.unit"><input type="text" list="unit-list" class="ri-unit" value="${esc(item_.unit || 'kpl')}"></td>`,
       `<td data-i18n-label="inv.unitPrice"><input type="text" inputmode="decimal" class="ri-price" placeholder="0,00" value="${esc(item_.price != null ? item_.price : '')}"></td>`,
-      `<td data-i18n-label="inv.vatCol"><select class="ri-vat">${vatSelectHTML(item_.vat || '25.5')}</select></td>`,
+      `<td data-i18n-label="inv.vatCol"><select class="ri-vat">${vatSelectHTML(item_.vat || defaultVat())}</select></td>`,
       `<td class="col-sum" data-i18n-label="inv.sum"><span class="ri-total">–</span></td>`,
       `<td><button type="button" class="btn btn-ghost remove-row" data-i18n-aria="inv.removeRow" aria-label="×" title="×">×</button></td>`,
     ].join('');
@@ -377,6 +455,47 @@
     }
   }
 
+  /* ---------- business profile ("Omat tiedot") ---------- */
+
+  /* The sender card on the page doubles as the profile editor: name,
+   * Y-tunnus, address, IBAN + default payment terms and default VAT %.
+   * Stored under its own localStorage key, separately from the draft. */
+  function collectProfile() {
+    const terms = parseInt($('#profileTerms').value, 10);
+    return {
+      v: 1,
+      name: $('#senderName').value,
+      bid: $('#senderBid').value,
+      address: $('#senderAddress').value,
+      iban: $('#senderIban').value,
+      defaultTerms: isNaN(terms) ? DEFAULT_TERMS : String(terms),
+      defaultVat: $('#profileVat').value || '25.5',
+    };
+  }
+
+  function applyProfile(p) {
+    if (!p) return;
+    const set = (id, v) => { if (v != null) $(id).value = v; };
+    set('#senderName', p.name);
+    set('#senderBid', p.bid);
+    set('#senderAddress', p.address);
+    set('#senderIban', p.iban);
+    set('#profileTerms', p.defaultTerms);
+    set('#profileVat', p.defaultVat);
+  }
+
+  function loadProfile() {
+    const raw = lsGet(LS_PROFILE);
+    if (!raw) return null;
+    try { return JSON.parse(raw); } catch (e) { lsDel(LS_PROFILE); return null; }
+  }
+
+  /* Profile persistence is gated by the remember opt-out. */
+  function saveProfile() {
+    if (!rememberOn()) return;
+    lsSet(LS_PROFILE, JSON.stringify(collectProfile()));
+  }
+
   /* ---------- draft: collect / apply / autosave ---------- */
 
   function collectForm() {
@@ -399,6 +518,7 @@
         terms: $('#paymentTerms').value,
         due: $('#dueDate').value,
       },
+      notes: $('#invoiceNotes').value,
       pricesIncl: $('#pricesInclVat').checked,
       items: collectItems(),
     };
@@ -418,6 +538,7 @@
     set('#invoiceDate', d.meta && d.meta.date);
     set('#paymentTerms', d.meta && d.meta.terms);
     set('#dueDate', d.meta && d.meta.due);
+    set('#invoiceNotes', d.notes);
     if (d.pricesIncl != null) $('#pricesInclVat').checked = !!d.pricesIncl;
     const items = Array.isArray(d.items) && d.items.length ? d.items : [{}];
     $('#items-body').innerHTML = '';
@@ -431,8 +552,14 @@
   }
 
   function saveDraft() {
+    if (!rememberOn()) {
+      /* opted out: nothing is ever persisted; keep the UI honest */
+      $('#autosave-note').textContent = t('inv.storageOff');
+      return;
+    }
     const data = collectForm();
     lsSet(LS_DRAFT, JSON.stringify(data));
+    saveProfile(); /* the sender card fields double as the persistent profile */
     if (data.meta.number && data.meta.number.trim()) {
       lsSet(LS_LAST_NO, data.meta.number.trim());
     }
@@ -443,18 +570,8 @@
     note.textContent = t('inv.savedAt') + ' ' + time;
   }
 
-  /* ---------- invoice numbering ---------- */
-
-  function nextInvoiceNumber(last) {
-    if (!last) return String(new Date().getFullYear()) + '001';
-    const m = String(last).match(/^(.*?)(\d+)$/);
-    if (!m) return last + '-2';
-    const prefix = m[1];
-    const digits = m[2];
-    let n = (BigInt(digits) + 1n).toString();
-    if (n.length < digits.length) n = n.padStart(digits.length, '0');
-    return prefix + n;
-  }
+  /* Invoice numbering lives in js/numbering.js (LP.numbering),
+   * shared with tests/increment.test.js via its UMD-lite export. */
 
   /* ---------- dates ---------- */
 
@@ -524,6 +641,7 @@
       `<th>${esc(t('print.unit'))}</th><th class="num">${esc(t('print.unitPrice'))}</th>` +
       `<th class="num">${esc(t('print.vat'))}</th><th class="num">${esc(t('print.sum'))}</th></tr></thead>` +
       `<tbody>${itemsRows || `<tr><td colspan="6">—</td></tr>`}</tbody></table>` +
+      (d.notes && d.notes.trim() ? `<p class="pv-notes">${esc(d.notes)}</p>` : '') +
       `<table class="pv-totals">${breakdownRows}` +
       `<tr><td>${esc(t('print.net'))}</td><td class="num">${esc(fmtMoney(totals.netC))}</td></tr>` +
       `<tr><td>${esc(t('print.vatSum'))}</td><td class="num">${esc(fmtMoney(totals.vatC))}</td></tr>` +
@@ -570,16 +688,32 @@
 
   function init() {
     /* default or restored state */
-    const draft = lsGet(LS_DRAFT);
-    if (draft) {
-      try { applyDraft(JSON.parse(draft)); } catch (e) { lsDel(LS_DRAFT); }
+    const remember = rememberOn();
+    refreshStorageUI(); /* checkbox reflects the stored opt-out */
+    if (remember) {
+      const profile = loadProfile();
+      if (profile) applyProfile(profile);
+      const draftRaw = lsGet(LS_DRAFT);
+      if (draftRaw) {
+        let draftApplied = false;
+        try { applyDraft(JSON.parse(draftRaw)); draftApplied = true; } catch (e) { lsDel(LS_DRAFT); }
+        if (draftApplied && !profile) {
+          /* migrate: v1 drafts predate the separate profile store */
+          saveProfile();
+        }
+      } else if (profile) {
+        /* fresh invoice with saved defaults: terms follow the profile */
+        $('#paymentTerms').value = defaultTerms();
+      }
     }
     if (!$('#items-body .item-row')) addRow();
     if (!$('#invoiceDate').value) $('#invoiceDate').value = todayISO();
+    if (!$('#paymentTerms').value) $('#paymentTerms').value = defaultTerms();
     if (!$('#dueDate').value) syncDueFromTerms();
     if (!$('#invoiceNumber').value) {
-      $('#invoiceNumber').value = nextInvoiceNumber(lsGet(LS_LAST_NO));
+      $('#invoiceNumber').value = Numbering.nextInvoiceNumber(lsGet(LS_LAST_NO));
     }
+    if (!remember) $('#autosave-note').textContent = t('inv.storageOff');
 
     renderTotals();
     renderRefs();
@@ -639,25 +773,55 @@
       if (src && src.textContent.trim() !== '—') copyText(src.textContent.trim(), btn);
     });
 
-    /* new invoice */
+    /* new invoice: keep the business profile, clear per-invoice fields */
     $('#new-invoice-btn').addEventListener('click', () => {
       if (!window.confirm(t('inv.confirmNew'))) return;
+      const profile = collectProfile(); /* snapshot before form.reset() */
+      /* When remembering is off there is no stored last number, so the
+       * on-screen number is the increment base. */
+      const lastNo = (rememberOn() && lsGet(LS_LAST_NO)) || $('#invoiceNumber').value.trim();
+      const next = Numbering.nextInvoiceNumber(lastNo || null);
       lsDel(LS_DRAFT);
-      const next = nextInvoiceNumber(lsGet(LS_LAST_NO));
       $('#invoice-form').reset();
+      applyProfile(profile);
       $('#items-body').innerHTML = '';
-      addRow();
+      addRow(); /* picks up the profile default VAT */
       $('#invoiceDate').value = todayISO();
-      $('#paymentTerms').value = DEFAULT_TERMS;
+      $('#paymentTerms').value = defaultTerms();
       syncDueFromTerms();
       $('#invoiceNumber').value = next;
-      lsSet(LS_LAST_NO, next);
       renderTotals();
       renderRefs();
       buildPrintView();
-      saveDraft();
-      $('#senderName').focus();
+      saveDraft(); /* no-op when remembering is off */
+      $('#clientName').focus(); /* sender stays prefilled → start at the client */
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    /* storage opt-out & clear (storage box above the form) */
+    $('#rememberMe').addEventListener('change', () => {
+      if ($('#rememberMe').checked) {
+        lsSet(LS_REMEMBER, '1');
+        setStorageStatus('');
+        saveDraft(); /* immediately persist the current profile + draft again */
+      } else {
+        if (!window.confirm(t('inv.confirmRememberOff'))) {
+          $('#rememberMe').checked = true; /* cancelled: revert the toggle */
+          return;
+        }
+        wipeStoredData();
+        lsSet(LS_REMEMBER, '0'); /* the opt-out itself is a setting: persist it */
+        refreshStorageUI();
+        $('#autosave-note').textContent = t('inv.storageOff');
+      }
+    });
+
+    $('#clear-saved-btn').addEventListener('click', () => {
+      if (!window.confirm(t('inv.confirmClear'))) return;
+      wipeStoredData();
+      setStorageStatus(t('inv.cleared'));
+      $('#autosave-note').textContent = t('inv.cleared');
+      /* While remembering stays on, the next edit autosaves a fresh draft. */
     });
 
     /* print */
@@ -673,6 +837,7 @@
       renderTotals();
       renderRefs();
       buildPrintView();
+      refreshStorageUI(); /* re-translate the storage status line */
     });
   }
 

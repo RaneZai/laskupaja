@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 PAGES = {
     "index.html": ["js/i18n.js", "js/home.js"],
-    "lasku/index.html": ["js/i18n.js", "js/invoice.js"],
+    "lasku/index.html": ["js/i18n.js", "js/numbering.js", "js/invoice.js"],
     "alv/index.html": ["js/i18n.js", "js/calculator.js"],
 }
 VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input",

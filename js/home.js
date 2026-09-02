@@ -45,6 +45,8 @@
       'home.a4': 'Täytä lasku ja paina Tulosta-painiketta tai Ctrl+P (Mac: Cmd+P) ja valitse "Tallenna PDF:änä". Tuloste on A4-kokoinen ja valmis asiakkaalle lähetettäväksi.',
       'home.privacyTitle': 'Yksityisyys: ',
       'home.privacyText': ' Laskupaja ei lähetä tietojasi minnekään. Sulje selain – luonnos odottaa sinua seuraavalla kerralla.',
+      'home.privacyStorage':
+        'Tiedot eivät koskaan lähde selaimestasi. Selaimeen tallentaminen on valinnaista – voit tyhjentää tallennetut tiedot milloin vain laskutyökalun sivulta.',
     },
     en: {
       'home.badge': '2026 VAT rates up to date: general 25.5% · reduced 13.5%',
@@ -84,6 +86,8 @@
       'home.a4': 'Fill in the invoice and press the Print button or Ctrl+P (Mac: Cmd+P), then choose “Save as PDF”. The printout is A4 and ready to send.',
       'home.privacyTitle': 'Privacy: ',
       'home.privacyText': ' Laskupaja never sends your data anywhere. Close the browser – your draft will be waiting.',
+      'home.privacyStorage':
+        'Your data never leaves your browser. Saving to the browser is optional – you can clear the saved data at any time on the invoice tool page.',
     },
   });
 })();

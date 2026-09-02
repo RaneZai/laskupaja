@@ -33,6 +33,21 @@ browser: no signup, no server, no tracking, no external network calls.
   format. Proven by `tests/reference.test.js`.
 - **FI/EN language toggle** persisted in `localStorage`; every UI string (and
   the printed invoice) exists in both languages.
+- **Business profile ("Omat tiedot")**: sender name, Y-tunnus, address, IBAN
+  plus default payment terms and default VAT % are stored under their own
+  `localStorage` key, separately from the per-invoice draft, and prefilled on
+  every load. "New invoice" keeps the profile, clears client/rows/message,
+  auto-increments the number and resets dates (today / today + default terms).
+- **Invoice numbering**: trailing digits are incremented with prefix and zero
+  padding preserved ("2026-004" → "2026-005", "INV007" → "INV008"); values
+  without trailing digits stay editable as-is. First visit prefills
+  `YYYY-001`. Proven by `tests/increment.test.js`.
+- **Storage transparency & opt-out**: the invoice page shows an info box
+  (FI/EN) explaining that data is stored only in the browser. "Remember my
+  details on this device" (default on) toggles all persistence; turning it
+  off – or "Clear saved data" – wipes every data key the app writes
+  (draft, last invoice number, profile). The language preference is a
+  non-personal UI setting and may persist.
 - **Print to PDF** (Ctrl+P / button): professional A4 print stylesheet –
   invoice header, item table, right-aligned totals, payment block
   (IBAN + viite + RF + amount + due date), footer disclaimer
@@ -64,10 +79,12 @@ python3 -m http.server 8000
 # → http://localhost:8000/
 ```
 
-Run the reference-number tests (plain Node, no dependencies):
+Run the tests (plain Node + Python stdlib, no dependencies):
 
 ```bash
-node tests/reference.test.js
+node tests/reference.test.js   # viitenumero (RF + national)
+node tests/increment.test.js   # invoice number increment
+python3 tests/integrity.py     # HTML/i18n/id/CSS integrity checks
 ```
 
 ## Deploy
@@ -135,7 +152,8 @@ laskupaja/
 ├── css/style.css       # shared styles incl. A4 print stylesheet
 ├── js/i18n.js          # FI/EN runtime (shared strings, localStorage)
 ├── js/reference.js     # viitenumero: national 7-3-1 + RF (ISO 11649)
-├── js/invoice.js       # invoice logic (rows, totals, drafts, print view)
+├── js/numbering.js     # invoice number increment (prefix/padding-preserving)
+├── js/invoice.js       # invoice logic (rows, totals, profile, drafts, print view)
 ├── js/calculator.js    # ALV calculator
 ├── js/home.js          # homepage strings
 ├── assets/             # favicon.svg, og-cover.svg

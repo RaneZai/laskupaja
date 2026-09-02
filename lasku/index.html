@@ -32,6 +32,7 @@
   -->
 
   <script src="../js/reference.js" defer></script>
+  <script src="../js/numbering.js" defer></script>
   <script src="../js/i18n.js" defer></script>
   <script src="../js/invoice.js" defer></script>
 </head>
@@ -67,11 +68,25 @@
     <h1 id="page-title" data-i18n="inv.title"></h1>
     <p class="lead" data-i18n="inv.lead" style="color: var(--muted); margin-top: -0.5rem;"></p>
 
+    <!-- Tallennuksen läpinäkyvyys / Storage transparency + opt-out (js/invoice.js) -->
+    <section class="storage-box" id="storage-box" data-i18n-aria="inv.storageTitle">
+      <p data-i18n="inv.storageInfo"></p>
+      <div class="storage-controls">
+        <span class="checkbox-field">
+          <input type="checkbox" id="rememberMe" checked>
+          <label for="rememberMe" data-i18n="inv.remember"></label>
+        </span>
+        <button type="button" class="btn btn-secondary btn-sm" id="clear-saved-btn" data-i18n="inv.clearSaved"></button>
+      </div>
+      <p class="storage-status" id="storage-status" aria-live="polite"></p>
+    </section>
+
     <form id="invoice-form" autocomplete="off" novalidate>
 
-      <!-- Laskuttaja / Sender -->
+      <!-- Omat tiedot / My details (persistent business profile) -->
       <section class="card">
-        <h2 data-i18n="inv.sender"></h2>
+        <h2 data-i18n="inv.myDetails"></h2>
+        <p class="hint card-hint" data-i18n="inv.myDetailsHint"></p>
         <div class="grid-2">
           <div class="field">
             <label for="senderName" data-i18n="inv.senderName"></label>
@@ -90,6 +105,21 @@
           <div class="field">
             <label for="senderIban" data-i18n="inv.iban"></label>
             <input type="text" id="senderIban" placeholder="FI21 1234 5600 0007 85">
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="profileTerms" data-i18n="inv.defaultTerms"></label>
+            <input type="number" id="profileTerms" min="0" max="365" step="1" value="14">
+          </div>
+          <div class="field">
+            <label for="profileVat" data-i18n="inv.defaultVat"></label>
+            <select id="profileVat">
+              <option value="25.5" selected data-i18n="vat.255"></option>
+              <option value="13.5" data-i18n="vat.135"></option>
+              <option value="10" data-i18n="vat.10"></option>
+              <option value="0" data-i18n="vat.0"></option>
+            </select>
           </div>
         </div>
       </section>
@@ -119,7 +149,7 @@
         <div class="grid-2">
           <div class="field">
             <label for="invoiceNumber" data-i18n="inv.number"></label>
-            <input type="text" id="invoiceNumber" inputmode="numeric" placeholder="2026001">
+            <input type="text" id="invoiceNumber" inputmode="numeric" placeholder="2026-001">
           </div>
           <div class="field">
             <label for="invoiceDate" data-i18n="inv.date"></label>
@@ -141,6 +171,10 @@
           <label for="pricesInclVat" data-i18n="inv.pricesIncl"></label>
         </div>
         <p class="hint" data-i18n="inv.pricesInclHint"></p>
+        <div class="field">
+          <label for="invoiceNotes" data-i18n="inv.notes"></label>
+          <textarea id="invoiceNotes" rows="2" data-i18n-placeholder="inv.notesPh"></textarea>
+        </div>
       </section>
 
       <!-- Laskurivit / Line items -->
