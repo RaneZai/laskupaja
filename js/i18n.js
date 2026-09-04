@@ -24,7 +24,7 @@
 
   /* Supported languages. FI/EN is the original pair (default 'fi');
    * ES and DE pages set <html data-lp-lang="es|de"> for their default. */
-  const LANGS = ['fi', 'en', 'es'];
+  const LANGS = ['fi', 'en', 'es', 'de'];
 
   /* Which languages each site family may show. The FI and EN sites share
    * the FI/EN pair (historic behaviour); the ES and DE sites pair their own
@@ -88,6 +88,24 @@
       'vat.0': '0 % – exento',
       'common.copy': 'Copiar',
       'common.copied': 'Copiado ✓',
+    },
+    de: {
+      'nav.home': 'Startseite',
+      'nav.invoice': 'Rechnung',
+      'nav.vat': 'MwSt.-Rechner',
+      'footer.disclaimer':
+        'Keine Rechtsberatung. Prüfe die Rechnungsdaten vor dem Versenden.',
+      'footer.sources': 'MwSt.-Sätze 2026: offizielle Quellen',
+      'footer.privacy':
+        'Alles wird nur in deinem Browser verarbeitet – nichts wird an einen Server gesendet.',
+      /* Finnish 2026 rate labels (shown only if a DE page ever runs with
+       * the fixed FI option list; the /de/ generator uses MwSt. presets). */
+      'vat.255': '25,5 % – Regelsatz (Finnland)',
+      'vat.135': '13,5 % – reduziert (Finnland; ab 1.1.2026, vorher 14 %)',
+      'vat.10': '10 % – z. B. Bücher, Arzneimittel, Beherbergung',
+      'vat.0': '0 % – steuerfrei',
+      'common.copy': 'Kopieren',
+      'common.copied': 'Kopiert ✓',
     },
   };
 

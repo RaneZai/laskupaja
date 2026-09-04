@@ -27,6 +27,9 @@ PAGES = {
     # plus the country-preset context, like /en/invoice/).
     "es/index.html": [],
     "es/factura/index.html": ["js/i18n.js", "js/vat-context.js", "js/numbering.js", "js/invoice.js"],
+    # German site (same pattern as the Spanish site).
+    "de/index.html": [],
+    "de/rechnung/index.html": ["js/i18n.js", "js/vat-context.js", "js/numbering.js", "js/invoice.js"],
 }
 VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input",
         "link", "meta", "param", "source", "track", "wbr"}
@@ -102,7 +105,8 @@ else:
     errors.append(f"css braces: {{={css.count('{')} }}={css.count('}')}")
 
 # ---------- 5. print-view is direct child of body (print CSS depends on it) ----------
-for lv in ["lasku/index.html", "en/invoice/index.html", "es/factura/index.html"]:
+for lv in ["lasku/index.html", "en/invoice/index.html", "es/factura/index.html",
+           "de/rechnung/index.html"]:
     src = (ROOT / lv).read_text()
     if re.search(r"<body>[\s\S]*?<div id=\"print-view\"", src):
         print(f"OK  #print-view present (direct child of body): {lv}")
@@ -110,7 +114,7 @@ for lv in ["lasku/index.html", "en/invoice/index.html", "es/factura/index.html"]
         errors.append(f"{lv}: #print-view not found")
 
 # ---------- 6. i18n key parity across locales ----------
-PARITY_LOCALES = ["fi", "en", "es"]  # + de once the German set lands
+PARITY_LOCALES = ["fi", "en", "es", "de"]
 
 def _brace_block(src, start):
     """src[start] must be '{'; return the inner text of the balanced block."""

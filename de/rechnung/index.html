@@ -1,0 +1,276 @@
+<!doctype html>
+<!-- Laskupaja – Rechnungs-Generator (deutsch). Gleiche Engine wie /lasku/
+     (js/invoice.js); standardmäßig deutsch (html[data-lp-lang]) und mit
+     deutschen Umsatzsteuersätzen (html[data-lp-country], verifiziert
+     2026-09-03, Quellen auf /en/vat/de/). Akzeptiert ?country=CC&vat=XX
+     wie /en/invoice/. -->
+<html lang="de" data-lp-lang="de" data-lp-country="DE">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- SEO: DE primary -->
+  <title>Rechnung erstellen – Rechnungsvorlage PDF kostenlos, MwSt. 19 % | Laskupaja</title>
+  <meta name="description" content="Rechnung erstellen kostenlos: Rechnungsnummer, Rechnungsdatum, Fälligkeitsdatum, MwSt. 19 % und 7 %, netto und brutto. Rechnungsvorlage als sauberes A4-PDF direkt im Browser, ohne Anmeldung – deine Daten verlassen dein Gerät nie.">
+
+  <link rel="canonical" href="https://laskupaja.com/de/rechnung/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Rechnung erstellen kostenlos – Rechnungsvorlage PDF, MwSt. 19 % | Laskupaja">
+  <meta property="og:description" content="Rechnungsvorlage als PDF mit MwSt. 19 % und 7 % – sauberer A4-Ausdruck direkt im Browser, ohne Anmeldung. Deine Daten verlassen dein Gerät nie.">
+  <meta property="og:url" content="https://laskupaja.com/de/rechnung/">
+  <meta property="og:image" content="https://laskupaja.com/assets/og-cover.svg">
+  <meta property="og:site_name" content="Laskupaja">
+  <meta property="og:locale" content="de_DE">
+  <meta property="og:locale:alternate" content="en_GB">
+  <meta property="og:locale:alternate" content="fi_FI">
+  <meta name="theme-color" content="#1d4ed8">
+
+  <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+  <link rel="stylesheet" href="../../css/style.css">
+
+  <!--
+    Umsatzsteuersätze (verifiziert 2026-09-03, Quellen auf /en/vat/de/):
+    - Standard: Deutschland 19 % / 7 % / 0 %
+    - ?country=CC&vat=XX: Presets weiterer Länder (ES, FR, IT, NL, PL, SE, IE)
+      oder Finnland 2026 ohne country-Parameter.
+  -->
+
+  <script src="../../js/reference.js" defer></script>
+  <script src="../../js/numbering.js" defer></script>
+  <script src="../../js/vat-context.js" defer></script>
+  <script src="../../js/i18n.js" defer></script>
+  <script src="../../js/invoice.js" defer></script>
+    <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "d3a80783da61452e90a2a0feccff2794"}'></script>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="../" aria-label="Laskupaja">
+        <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
+          <rect width="64" height="64" rx="14" fill="#1d4ed8"/>
+          <rect x="18" y="12" width="28" height="40" rx="3" fill="#fff"/>
+          <rect x="23" y="20" width="18" height="3" rx="1.5" fill="#c7d2fe"/>
+          <rect x="23" y="27" width="18" height="3" rx="1.5" fill="#c7d2fe"/>
+          <rect x="23" y="34" width="11" height="3" rx="1.5" fill="#c7d2fe"/>
+          <circle cx="42" cy="44" r="8" fill="#047857"/>
+          <text x="42" y="48.5" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#fff">€</text>
+        </svg>
+        Laskupaja
+      </a>
+      <nav class="main-nav" aria-label="Hauptmenü">
+        <a class="nav-link" href="../" data-i18n="nav.home"></a>
+        <a class="nav-link active" href="./" data-i18n="nav.invoice"></a>
+        <a class="nav-link" href="../../en/vat/de/">Deutschland-Guide</a>
+      </nav>
+      <div class="lang-toggle" role="group" aria-label="Sprache / Language">
+        <button type="button" data-lang-toggle="de" aria-pressed="true">DE</button>
+        <button type="button" data-lang-toggle="en" aria-pressed="false">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container narrow">
+    <h1 id="page-title" data-i18n="inv.title"></h1>
+    <p class="lead" data-i18n="inv.lead" style="color: var(--muted); margin-top: -0.5rem;"></p>
+
+    <!-- Hinweis zur Rechnungsstellung in Deutschland (statischer Seiteninhalt) -->
+    <section class="notice" lang="de" aria-label="Hinweis zur Rechnungsstellung in Deutschland">
+      <p><strong>Deutschland:</strong> <strong>Kleinunternehmer nach §19 UStG</strong> weisen keine Umsatzsteuer aus – im Generator dafür 0 % wählen und z. B. „Kein Ausweis von Umsatzsteuer gem. §19 UStG“ als Nachricht auf die Rechnung schreiben. Regelsätze 2026: <strong>19 %</strong> · reduziert <strong>7 %</strong>. Mehr im <a href="../../en/vat/de/">Deutschland-Guide</a> (auf Englisch).</p>
+    </section>
+
+    <!-- Datenspeicher-Transparenz (js/invoice.js) -->
+    <section class="storage-box" id="storage-box" data-i18n-aria="inv.storageTitle">
+      <p data-i18n="inv.storageInfo"></p>
+      <div class="storage-controls">
+        <span class="checkbox-field">
+          <input type="checkbox" id="rememberMe" checked>
+          <label for="rememberMe" data-i18n="inv.remember"></label>
+        </span>
+        <button type="button" class="btn btn-secondary btn-sm" id="clear-saved-btn" data-i18n="inv.clearSaved"></button>
+      </div>
+      <p class="storage-status" id="storage-status" aria-live="polite"></p>
+    </section>
+
+    <form id="invoice-form" autocomplete="off" novalidate>
+
+      <!-- Meine Daten (persistentes Profil) -->
+      <section class="card">
+        <h2 data-i18n="inv.myDetails"></h2>
+        <p class="hint card-hint" data-i18n="inv.myDetailsHint"></p>
+        <div class="grid-2">
+          <div class="field">
+            <label for="senderName" data-i18n="inv.senderName"></label>
+            <input type="text" id="senderName" data-i18n-placeholder="inv.namePh">
+          </div>
+          <div class="field">
+            <label for="senderBid" data-i18n="inv.senderBid"></label>
+            <input type="text" id="senderBid" placeholder="z. B. DE123456789">
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="senderAddress" data-i18n="inv.address"></label>
+            <textarea id="senderAddress" rows="2"></textarea>
+          </div>
+          <div class="field">
+            <label for="senderIban" data-i18n="inv.iban"></label>
+            <input type="text" id="senderIban" placeholder="DE89 3704 0044 0532 0130 00">
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="profileTerms" data-i18n="inv.defaultTerms"></label>
+            <input type="number" id="profileTerms" min="0" max="365" step="1" value="14">
+          </div>
+          <div class="field">
+            <label for="profileVat" data-i18n="inv.defaultVat"></label>
+            <select id="profileVat">
+              <option value="25.5" selected data-i18n="vat.255"></option>
+              <option value="13.5" data-i18n="vat.135"></option>
+              <option value="10" data-i18n="vat.10"></option>
+              <option value="0" data-i18n="vat.0"></option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- Kunde -->
+      <section class="card">
+        <h2 data-i18n="inv.client"></h2>
+        <div class="grid-2">
+          <div class="field">
+            <label for="clientName" data-i18n="inv.clientName"></label>
+            <input type="text" id="clientName" data-i18n-placeholder="inv.namePh">
+          </div>
+          <div class="field">
+            <label for="clientBid" data-i18n="inv.clientBid"></label>
+            <input type="text" id="clientBid" placeholder="z. B. FR40123456789">
+          </div>
+        </div>
+        <div class="field">
+          <label for="clientAddress" data-i18n="inv.address"></label>
+          <textarea id="clientAddress" rows="2"></textarea>
+        </div>
+      </section>
+
+      <!-- Rechnungsdaten -->
+      <section class="card">
+        <h2 data-i18n="inv.details"></h2>
+        <div class="grid-2">
+          <div class="field">
+            <label for="invoiceNumber" data-i18n="inv.number"></label>
+            <input type="text" id="invoiceNumber" inputmode="numeric" placeholder="2026-001">
+          </div>
+          <div class="field">
+            <label for="invoiceDate" data-i18n="inv.date"></label>
+            <input type="date" id="invoiceDate" required>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="paymentTerms" data-i18n="inv.terms"></label>
+            <input type="number" id="paymentTerms" min="0" max="365" step="1" value="14">
+          </div>
+          <div class="field">
+            <label for="dueDate" data-i18n="inv.due"></label>
+            <input type="date" id="dueDate" required>
+          </div>
+        </div>
+        <div class="checkbox-field">
+          <input type="checkbox" id="pricesInclVat">
+          <label for="pricesInclVat" data-i18n="inv.pricesIncl"></label>
+        </div>
+        <p class="hint" data-i18n="inv.pricesInclHint"></p>
+        <div class="field">
+          <label for="invoiceNotes" data-i18n="inv.notes"></label>
+          <textarea id="invoiceNotes" rows="2" data-i18n-placeholder="inv.notesPh"></textarea>
+        </div>
+      </section>
+
+      <!-- Rechnungspositionen -->
+      <section class="card">
+        <h2 data-i18n="inv.items"></h2>
+        <div class="table-wrap">
+          <table class="items" id="items-table">
+            <thead>
+              <tr>
+                <th class="col-desc" scope="col" data-i18n="inv.desc"></th>
+                <th scope="col" data-i18n="inv.qty"></th>
+                <th scope="col" data-i18n="inv.unit"></th>
+                <th scope="col" data-i18n="inv.unitPrice"></th>
+                <th scope="col" data-i18n="inv.vatCol"></th>
+                <th scope="col" data-i18n="inv.sum"></th>
+                <th scope="col"><span class="visually-hidden" data-i18n="inv.removeRow"></span></th>
+              </tr>
+            </thead>
+            <tbody id="items-body"><!-- Zeilen gerendert von js/invoice.js --></tbody>
+          </table>
+        </div>
+        <datalist id="unit-list">
+          <option value="Stk."></option><option value="h"></option><option value="Tag"></option>
+          <option value="Monat"></option><option value="km"></option><option value="kg"></option>
+          <option value="l"></option><option value="m"></option><option value="m²"></option>
+          <option value="Satz"></option><option value="%"></option>
+        </datalist>
+        <button type="button" class="btn btn-secondary btn-sm" id="add-row" data-i18n="inv.addRow"></button>
+      </section>
+
+      <!-- Zusammenfassung -->
+      <section class="card">
+        <h2 data-i18n="inv.totals"></h2>
+        <div id="totals"><!-- gerendert von js/invoice.js --></div>
+      </section>
+
+      <!-- Zahlungsreferenz -->
+      <section class="card">
+        <h2 data-i18n="inv.ref"></h2>
+        <div class="ref-grid">
+          <div class="ref-box">
+            <h3 data-i18n="inv.refNational"></h3>
+            <span class="mono" id="ref-national-value">—</span>
+            <p class="hint" data-i18n="inv.refNationalHint"></p>
+            <button type="button" class="btn btn-secondary btn-sm copy-btn" data-copy="ref-national-value" data-i18n="common.copy"></button>
+          </div>
+          <div class="ref-box">
+            <h3 data-i18n="inv.refRF"></h3>
+            <span class="mono" id="ref-rf-value">—</span>
+            <p class="hint" data-i18n="inv.refRFHint"></p>
+            <button type="button" class="btn btn-secondary btn-sm copy-btn" data-copy="ref-rf-value" data-i18n="common.copy"></button>
+          </div>
+        </div>
+        <p class="hint" data-i18n="inv.refHint" style="margin-top:0.8rem;"></p>
+        <div class="inline-row" style="margin-top:0.5rem;">
+          <input type="text" id="ref-check-input" data-i18n-placeholder="inv.refCheckPh" data-i18n-aria="inv.refCheckLabel">
+          <button type="button" class="btn btn-secondary btn-sm" id="ref-check-btn" data-i18n="inv.refCheckBtn"></button>
+          <span id="ref-check-result" aria-live="polite"></span>
+        </div>
+      </section>
+
+      <!-- MONETIZATION SLOT (below-tools): reserved for affiliate links.
+           See README § Monetization. -->
+
+      <div class="actions-row">
+        <button type="button" class="btn btn-primary" id="print-btn">
+          <span data-i18n="inv.print"></span> <kbd>Ctrl+P</kbd>
+        </button>
+        <button type="button" class="btn btn-secondary" id="new-invoice-btn" data-i18n="inv.new"></button>
+        <span class="autosave-note" id="autosave-note" data-i18n="inv.autosave"></span>
+      </div>
+    </form>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span data-i18n="footer.disclaimer"></span>
+      <span>Quellen: <a href="https://www.gesetze-im-internet.de/ustg_1980/__12.html" target="_blank" rel="noopener">§12 UStG (Sätze)</a>; <a href="https://www.bundesfinanzministerium.de/Content/DE/FAQ/e-rechnung.html" target="_blank" rel="noopener">BMF – E-Rechnung</a> (2026)</span>
+      <span data-i18n="footer.privacy"></span>
+      <span>Länder-Presets: <a href="../../en/#guides">MwSt.-Guides (EN)</a></span>
+    </div>
+  </footer>
+
+  <!-- A4-Druckansicht, gefüllt von js/invoice.js vor dem Drucken. -->
+  <div id="print-view" aria-hidden="true"></div>
+
+</body>
+</html>
