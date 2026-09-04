@@ -23,6 +23,10 @@ PAGES = {
     "en/vat/pl/index.html": [],
     "en/vat/se/index.html": [],
     "en/vat/ie/index.html": [],
+    # Spanish site (static homepage; the generator loads the shared engine
+    # plus the country-preset context, like /en/invoice/).
+    "es/index.html": [],
+    "es/factura/index.html": ["js/i18n.js", "js/vat-context.js", "js/numbering.js", "js/invoice.js"],
 }
 VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input",
         "link", "meta", "param", "source", "track", "wbr"}
@@ -98,11 +102,87 @@ else:
     errors.append(f"css braces: {{={css.count('{')} }}={css.count('}')}")
 
 # ---------- 5. print-view is direct child of body (print CSS depends on it) ----------
-lv = (ROOT / "lasku/index.html").read_text()
-if re.search(r"<body>[\s\S]*?<div id=\"print-view\"", lv):
-    print("OK  #print-view present (direct child of body)")
-else:
-    errors.append("lasku/index.html: #print-view not found")
+for lv in ["lasku/index.html", "en/invoice/index.html", "es/factura/index.html"]:
+    src = (ROOT / lv).read_text()
+    if re.search(r"<body>[\s\S]*?<div id=\"print-view\"", src):
+        print(f"OK  #print-view present (direct child of body): {lv}")
+    else:
+        errors.append(f"{lv}: #print-view not found")
+
+# ---------- 6. i18n key parity across locales ----------
+PARITY_LOCALES = ["fi", "en", "es"]  # + de once the German set lands
+
+def _brace_block(src, start):
+    """src[start] must be '{'; return the inner text of the balanced block."""
+    depth = 0
+    for k in range(start, len(src)):
+        if src[k] == "{":
+            depth += 1
+        elif src[k] == "}":
+            depth -= 1
+            if depth == 0:
+                return src[start + 1:k]
+    return None
+
+def _locale_keys(block, locale):
+    m = re.search(r"\b" + locale + r"\s*:\s*\{", block)
+    if not m:
+        return None
+    inner = _brace_block(block, m.end() - 1)
+    if inner is None:
+        return None
+    return set(re.findall(r"'([a-zA-Z0-9_.]+)'\s*:", inner))
+
+for js, anchor, what in [
+    ("js/i18n.js", "const SHARED =", "shared strings"),
+    ("js/invoice.js", "LP.i18n.register({", "invoice page strings"),
+]:
+    src = (ROOT / js).read_text()
+    i = src.find(anchor)
+    block = _brace_block(src, src.find("{", i)) if i != -1 else None
+    if block is None:
+        errors.append(f"{js}: dictionary block after '{anchor}' not found")
+        continue
+    keysets = {loc: _locale_keys(block, loc) for loc in PARITY_LOCALES}
+    missing = [loc for loc, ks in keysets.items() if ks is None]
+    if missing:
+        errors.append(f"{js}: {what}: missing locale dict(s) {missing}")
+        continue
+    base = keysets["fi"]
+    ok = True
+    for loc in PARITY_LOCALES[1:]:
+        if keysets[loc] != base:
+            errors.append(
+                f"{js}: {what}: locale '{loc}' key set differs from 'fi' "
+                f"(missing {sorted(base - keysets[loc])}, extra {sorted(keysets[loc] - base)})")
+            ok = False
+    if ok:
+        print(f"OK  {what}: key parity across {PARITY_LOCALES} ({len(base)} keys)")
+
+# ---------- 7. no external resources; local refs resolve ----------
+# The Cloudflare Web Analytics beacon is the only allowed external resource.
+BEACON_SRC = "https://static.cloudflareinsights.com/beacon.min.js"
+for page in PAGES:
+    html = (ROOT / page).read_text()
+    for m in re.finditer(r'<script[^>]+src="(https?://[^"]+)"', html):
+        if m.group(1) != BEACON_SRC:
+            errors.append(f"{page}: external script {m.group(1)}")
+    for m in re.finditer(r'<link\b[^>]*>', html):
+        tag = m.group(0)
+        rel = re.search(r'rel="([^"]+)"', tag)
+        href = re.search(r'href="(https?://[^"]+)"', tag)
+        if href and rel and re.search(r"stylesheet|icon|preload|modulepreload|fetch", rel.group(1)):
+            errors.append(f"{page}: external link resource {href.group(1)}")
+    base = (ROOT / page).parent
+    for m in re.finditer(r'(?:src|href)="([^"#?]+)"', html):
+        u = m.group(1)
+        if re.match(r"^[a-zA-Z][a-zA-Z0-9+.-]*:", u) or u.startswith("//"):
+            continue  # external URL, checked above
+        if u.endswith("/"):
+            continue  # page route, not a file
+        if not (base / u).resolve().exists():
+            errors.append(f"{page}: broken local reference {u}")
+print("OK  resources: no external scripts/stylesheets besides the beacon; local refs resolve")
 
 print()
 if errors:

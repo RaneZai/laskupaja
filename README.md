@@ -4,7 +4,7 @@
 calculator for Finnish freelancers and small businesses. Everything runs in the
 browser: no signup, no server, no tracking, no external network calls.
 
-- Suomeksi (oletus) ja englanniksi · Finnish (default) and English
+- Suomeksi (oletus), englanniksi ja espanjaksi · Finnish (default), English and Spanish
 - Correct **2026 VAT rates** from day one: general **25,5 %**, reduced
   **13,5 %** (from **1.1.2026**, previously 14 %), **10 %**, **0 %**
 - Pure client-side HTML/CSS/JS. No build step, no npm, no CDNs, no fonts
@@ -17,6 +17,8 @@ browser: no signup, no server, no tracking, no external network calls.
 | `/` | Homepage: value proposition FI/EN, links to tools, FAQ, SEO text |
 | `/lasku/` | Invoice generator (line items, VAT breakdown, references, A4 print) |
 | `/alv/` | ALV calculator (add/remove VAT, 2026 rates + custom %, rate info) |
+| `/es/` | Spanish homepage: value proposition, tool links, IVA 21 % SEO copy |
+| `/es/factura/` | Invoice generator, Spanish default (data-lp-lang="es"), IVA presets 21/10/4/0 via data-lp-country="ES" |
 
 ## Features
 
