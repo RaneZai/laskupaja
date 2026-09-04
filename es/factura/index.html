@@ -1,25 +1,26 @@
 <!doctype html>
-<!-- Laskupaja invoice generator – English/EU entry. Same engine as /lasku/
-     (js/invoice.js), but defaults to English (html[data-lp-lang]) and accepts
-     ?country=CC&vat=XX via js/vat-context.js (rates verified 2026-09-03,
-     sources cited on /en/vat/[cc]/). Finnish page stays at /lasku/. -->
-<html lang="en" data-lp-lang="en">
+<!-- Laskupaja – generador de facturas (español). Mismo motor que /lasku/
+     (js/invoice.js); por defecto en español (html[data-lp-lang]) y con
+     tipos de IVA de España (html[data-lp-country], verificado 2026-09-03,
+     fuentes en /en/vat/es/). Admite ?country=CC&vat=XX como /en/invoice/. -->
+<html lang="es" data-lp-lang="es" data-lp-country="ES">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- SEO: EN primary -->
-  <title>Free Invoice Generator – PDF in your browser, EU VAT presets | Laskupaja</title>
-  <meta name="description" content="Build a professional invoice and save it as a PDF – free, no signup. One-click presets for German, French, Italian, Spanish, Dutch, Polish, Swedish and Irish VAT rates, or Finnish 2026 rates. Your data never leaves your browser.">
+  <!-- SEO: ES primary -->
+  <title>Crear factura gratis – Plantilla factura PDF con IVA 21 % | Laskupaja</title>
+  <meta name="description" content="Crear facturas gratis y guardarlas en PDF: nº de factura, vencimiento, IVA 21 %, 10 % y 4 %, base imponible y forma de pago. Plantilla factura PDF en A4 directamente en tu navegador, sin registro y tus datos nunca salen de tu dispositivo.">
 
-  <link rel="canonical" href="https://laskupaja.com/en/invoice/">
+  <link rel="canonical" href="https://laskupaja.com/es/factura/">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Free Invoice Generator – print or save as PDF | Laskupaja">
-  <meta property="og:description" content="Create a professional invoice in your browser: line items, VAT presets for 8 EU countries, payment references, A4 printout. No signup, everything stays on your device.">
-  <meta property="og:url" content="https://laskupaja.com/en/invoice/">
+  <meta property="og:title" content="Crear facturas gratis – Plantilla factura PDF, IVA 21 % | Laskupaja">
+  <meta property="og:description" content="Crea facturas profesionales en PDF con IVA 21 %, 10 % y 4 %, directamente en tu navegador. Sin registro: tus datos no salen de tu dispositivo.">
+  <meta property="og:url" content="https://laskupaja.com/es/factura/">
   <meta property="og:image" content="https://laskupaja.com/assets/og-cover.svg">
   <meta property="og:site_name" content="Laskupaja">
-  <meta property="og:locale" content="en_GB">
+  <meta property="og:locale" content="es_ES">
+  <meta property="og:locale:alternate" content="en_GB">
   <meta property="og:locale:alternate" content="fi_FI">
   <meta name="theme-color" content="#1d4ed8">
 
@@ -27,10 +28,10 @@
   <link rel="stylesheet" href="../../css/style.css">
 
   <!--
-    VAT options:
-    - default (no ?country=): Finnish 2026 rates (verified 2026-09-02):
-      https://www.vero.fi/yritykset-ja-yhteisot/verot-ja-maksut/arvonlisaverotus/arvonlisaveroprosentit/
-    - ?country=CC&vat=XX: presets verified 2026-09-03, see /en/vat/[cc]/ pages.
+    Tipos de IVA (verificados 2026-09-03, fuentes en /en/vat/es/):
+    - por defecto: España 21 % / 10 % / 4 % / 0 %
+    - ?country=CC&vat=XX: presets de otros países (DE, FR, IT, NL, PL, SE, IE)
+      o Finlandia 2026 sin parámetro country.
   -->
 
   <script src="../../js/reference.js" defer></script>
@@ -56,14 +57,14 @@
         </svg>
         Laskupaja
       </a>
-      <nav class="main-nav" aria-label="Main menu">
+      <nav class="main-nav" aria-label="Menú principal">
         <a class="nav-link" href="../" data-i18n="nav.home"></a>
         <a class="nav-link active" href="./" data-i18n="nav.invoice"></a>
-        <a class="nav-link" href="../#guides">VAT guides</a>
+        <a class="nav-link" href="../../en/vat/es/">Guía IVA España</a>
       </nav>
-      <div class="lang-toggle" role="group" aria-label="Kieli / Language">
-        <button type="button" data-lang-toggle="fi" aria-pressed="false">FI</button>
-        <button type="button" data-lang-toggle="en" aria-pressed="true">EN</button>
+      <div class="lang-toggle" role="group" aria-label="Idioma / Language">
+        <button type="button" data-lang-toggle="es" aria-pressed="true">ES</button>
+        <button type="button" data-lang-toggle="en" aria-pressed="false">EN</button>
       </div>
     </div>
   </header>
@@ -72,7 +73,12 @@
     <h1 id="page-title" data-i18n="inv.title"></h1>
     <p class="lead" data-i18n="inv.lead" style="color: var(--muted); margin-top: -0.5rem;"></p>
 
-    <!-- Storage transparency + opt-out (js/invoice.js) -->
+    <!-- Nota de facturación en España (contenido estático de la página) -->
+    <section class="notice" lang="es" aria-label="Nota sobre facturación en España">
+      <p><strong>España:</strong> la factura completa debe identificar a emisor y destinatario (NIF/CIF incluido); la <em>factura simplificada</em> (tipo tique) solo vale hasta 400 € IVA incluido (3.000 € en sectores autorizados). Tipos de IVA 2026: <strong>21 %</strong> general · <strong>10 %</strong> reducido · <strong>4 %</strong> superreducido. Más detalles en la <a href="../../en/vat/es/">guía de IVA en España</a> (en inglés).</p>
+    </section>
+
+    <!-- Transparencia de almacenamiento (js/invoice.js) -->
     <section class="storage-box" id="storage-box" data-i18n-aria="inv.storageTitle">
       <p data-i18n="inv.storageInfo"></p>
       <div class="storage-controls">
@@ -87,7 +93,7 @@
 
     <form id="invoice-form" autocomplete="off" novalidate>
 
-      <!-- My details (persistent business profile) -->
+      <!-- Mis datos (perfil persistente) -->
       <section class="card">
         <h2 data-i18n="inv.myDetails"></h2>
         <p class="hint card-hint" data-i18n="inv.myDetailsHint"></p>
@@ -98,7 +104,7 @@
           </div>
           <div class="field">
             <label for="senderBid" data-i18n="inv.senderBid"></label>
-            <input type="text" id="senderBid" placeholder="e.g. DE123456789 or FI12345678">
+            <input type="text" id="senderBid" placeholder="p. ej. ESB12345678 o 12345678Z">
           </div>
         </div>
         <div class="grid-2">
@@ -108,7 +114,7 @@
           </div>
           <div class="field">
             <label for="senderIban" data-i18n="inv.iban"></label>
-            <input type="text" id="senderIban" placeholder="DE89 3704 0044 0532 0130 00">
+            <input type="text" id="senderIban" placeholder="ES91 2100 0418 4502 0005 1332">
           </div>
         </div>
         <div class="grid-2">
@@ -128,7 +134,7 @@
         </div>
       </section>
 
-      <!-- Client -->
+      <!-- Cliente -->
       <section class="card">
         <h2 data-i18n="inv.client"></h2>
         <div class="grid-2">
@@ -138,7 +144,7 @@
           </div>
           <div class="field">
             <label for="clientBid" data-i18n="inv.clientBid"></label>
-            <input type="text" id="clientBid" placeholder="e.g. FR40123456789">
+            <input type="text" id="clientBid" placeholder="p. ej. FR40123456789">
           </div>
         </div>
         <div class="field">
@@ -147,7 +153,7 @@
         </div>
       </section>
 
-      <!-- Invoice details -->
+      <!-- Datos de la factura -->
       <section class="card">
         <h2 data-i18n="inv.details"></h2>
         <div class="grid-2">
@@ -181,7 +187,7 @@
         </div>
       </section>
 
-      <!-- Line items -->
+      <!-- Conceptos -->
       <section class="card">
         <h2 data-i18n="inv.items"></h2>
         <div class="table-wrap">
@@ -197,25 +203,25 @@
                 <th scope="col"><span class="visually-hidden" data-i18n="inv.removeRow"></span></th>
               </tr>
             </thead>
-            <tbody id="items-body"><!-- rows rendered by js/invoice.js --></tbody>
+            <tbody id="items-body"><!-- filas generadas por js/invoice.js --></tbody>
           </table>
         </div>
         <datalist id="unit-list">
-          <option value="pcs"></option><option value="h"></option><option value="day"></option>
-          <option value="month"></option><option value="km"></option><option value="kg"></option>
+          <option value="ud."></option><option value="h"></option><option value="día"></option>
+          <option value="mes"></option><option value="km"></option><option value="kg"></option>
           <option value="l"></option><option value="m"></option><option value="m²"></option>
-          <option value="set"></option><option value="%"></option>
+          <option value="juego"></option><option value="%"></option>
         </datalist>
         <button type="button" class="btn btn-secondary btn-sm" id="add-row" data-i18n="inv.addRow"></button>
       </section>
 
-      <!-- Totals -->
+      <!-- Resumen -->
       <section class="card">
         <h2 data-i18n="inv.totals"></h2>
-        <div id="totals"><!-- rendered by js/invoice.js --></div>
+        <div id="totals"><!-- generado por js/invoice.js --></div>
       </section>
 
-      <!-- Payment reference -->
+      <!-- Referencia de pago -->
       <section class="card">
         <h2 data-i18n="inv.ref"></h2>
         <div class="ref-grid">
@@ -256,15 +262,13 @@
   <footer class="site-footer">
     <div class="footer-inner">
       <span data-i18n="footer.disclaimer"></span>
-      <span>
-        <a href="https://www.vero.fi/yritykset-ja-yhteisot/verot-ja-maksut/arvonlisaverotus/arvonlisaveroprosentit/" target="_blank" rel="noopener" data-i18n="footer.sources"></a>
-      </span>
+      <span>Fuentes: <a href="https://sede.agenciatributaria.gob.es/Sede/iva/calculo-iva-repercutido-clientes/tipos-impositivos-iva.html" target="_blank" rel="noopener">Agencia Tributaria – tipos de IVA</a> (2026)</span>
       <span data-i18n="footer.privacy"></span>
-      <span>Country VAT presets: <a href="../#guides">VAT guides (DE, FR, IT, ES, NL, PL, SE, IE)</a></span>
+      <span>Presets por país: <a href="../../en/#guides">guías de IVA (EN)</a></span>
     </div>
   </footer>
 
-  <!-- Print-only A4 invoice, populated by js/invoice.js before printing. -->
+  <!-- Vista de impresión A4, generada por js/invoice.js antes de imprimir. -->
   <div id="print-view" aria-hidden="true"></div>
 
 </body>

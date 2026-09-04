@@ -1,8 +1,10 @@
 /* ============================================================
- * Laskupaja – country VAT presets for /en/invoice/ (only).
+ * Laskupaja – country VAT presets for the international generator
+ * pages (/en/invoice/, /es/factura/, /de/rechnung/).
  * Loaded before js/invoice.js. Reads ?country=CC&vat=XX:
  *  - valid CC  -> stored under laskupaja:country and applied
- *  - no CC     -> falls back to the stored country, if any
+ *  - no CC     -> the page's own default (e.g. data-lp-country="ES" on
+ *                 /es/factura/), else the stored country, if any
  * Exposes window.LP_VAT_CONTEXT = { country, rates, defaultVat, unit }
  * which js/invoice.js uses to swap the Finnish VAT options.
  * The /lasku/ page never loads this file, so FI behavior is unchanged.
@@ -29,6 +31,13 @@
     IE: ['23', '13.5', '9', '4.8', '0'],
   };
 
+  /* Default unit label for new invoice rows per country ('kpl' is the FI
+   * page default in js/invoice.js; unlisted countries fall back to 'pcs'). */
+  var COUNTRY_UNITS = {
+    DE: 'Stk.',
+    ES: 'ud.',
+  };
+
   function lsGet(key) {
     try { return localStorage.getItem(key); } catch (e) { return null; }
   }
@@ -47,8 +56,18 @@
   if (country) {
     lsSet(STORAGE_KEY, country); /* remember the choice for later visits */
   } else {
-    var stored = lsGet(STORAGE_KEY);
-    if (stored && Object.prototype.hasOwnProperty.call(COUNTRY_RATES, stored)) country = stored;
+    /* Page-level default from <html data-lp-country="CC">: applied but
+     * never stored, so visiting /es/factura/ does not rewrite the remembered
+     * country of the /en/ funnel (and vice versa). */
+    var pageDefault = (document.documentElement.getAttribute('data-lp-country') || '')
+      .trim()
+      .toUpperCase();
+    if (Object.prototype.hasOwnProperty.call(COUNTRY_RATES, pageDefault)) {
+      country = pageDefault;
+    } else {
+      var stored = lsGet(STORAGE_KEY);
+      if (stored && Object.prototype.hasOwnProperty.call(COUNTRY_RATES, stored)) country = stored;
+    }
   }
 
   if (!country) return; /* no preset -> generator keeps the Finnish 2026 rates */
@@ -77,6 +96,6 @@
     country: country,
     rates: rates,
     defaultVat: vat || rates[0], /* first entry = standard rate */
-    unit: 'pcs', /* default unit for new rows (FI pages use 'kpl') */
+    unit: COUNTRY_UNITS[country] || 'pcs', /* default unit for new rows (FI pages use 'kpl') */
   };
 })();

@@ -214,6 +214,100 @@
       'print.disclaimer': 'Not legal advice.',
       'print.madeWith': 'Invoice made with Laskupaja – laskupaja.com',
     },
+    es: {
+      'inv.title': 'Generador de facturas',
+      'inv.lead': 'Rellena los datos, revisa el resumen e imprime la factura como PDF A4. El borrador se guarda automáticamente en tu navegador.',
+      'inv.myDetails': 'Mis datos – emisor',
+      'inv.myDetailsHint': 'Estos datos se guardan en tu navegador y se rellenan automáticamente en futuras facturas.',
+      'inv.senderName': 'Nombre o empresa *',
+      'inv.namePh': 'p. ej. María García / García S.L.',
+      'inv.senderBid': 'NIF/CIF o n.º IVA intracomunitario',
+      'inv.address': 'Dirección',
+      'inv.iban': 'IBAN (número de cuenta)',
+      'inv.defaultTerms': 'Plazo de pago por defecto (días)',
+      'inv.defaultVat': 'IVA % por defecto para nuevas líneas',
+      'inv.client': 'Cliente',
+      'inv.clientName': 'Nombre o empresa *',
+      'inv.clientBid': 'NIF/CIF o n.º IVA intracomunitario (opcional)',
+      'inv.details': 'Datos de la factura',
+      'inv.number': 'Nº de factura',
+      'inv.date': 'Fecha de la factura',
+      'inv.terms': 'Plazo de pago (días)',
+      'inv.due': 'Vencimiento',
+      'inv.pricesIncl': 'Los precios unitarios introducidos incluyen IVA',
+      'inv.pricesInclHint': 'Si no está marcado, los precios se tratan como base imponible (sin IVA) y el IVA se añade encima.',
+      'inv.notes': 'Mensaje en la factura (opcional)',
+      'inv.notesPh': 'p. ej. ¡Gracias por tu pedido!',
+      'inv.items': 'Conceptos',
+      'inv.desc': 'Concepto',
+      'inv.descPh': 'p. ej. Diseño de páginas web',
+      'inv.qty': 'Cantidad',
+      'inv.unit': 'Unidad',
+      'inv.unitPrice': 'Precio unitario (€)',
+      'inv.vatCol': 'IVA %',
+      'inv.sum': 'Importe',
+      'inv.removeRow': 'Eliminar línea',
+      'inv.addRow': '+ Añadir línea',
+      'inv.totals': 'Resumen',
+      'inv.netTotal': 'Base imponible total',
+      'inv.vatTotal': 'Total IVA',
+      'inv.grossTotal': 'Total a pagar',
+      'inv.vatFrom': 'IVA',
+      'inv.netLabel': 'base imponible',
+      'inv.pricesInclNote': 'Los precios se tratan como IVA incluido.',
+      'inv.pricesExclNote': 'Los precios van sin IVA; el IVA se añade encima.',
+      'inv.ref': 'Referencia de pago',
+      'inv.refNational': 'Referencia nacional finlandesa',
+      'inv.refRF': 'Referencia internacional RF (ISO 11649)',
+      'inv.refNationalHint': 'Estándar finlandés, dígito de control 7-3-1. Para pagos dentro de Finlandia.',
+      'inv.refRFHint': 'Válida también para pagos SEPA internacionales.',
+      'inv.refHint': 'Las referencias se generan automáticamente a partir del número de factura (la RF usa sus letras y dígitos).',
+      'inv.refCheckPh': 'Pega una referencia o referencia RF para comprobar…',
+      'inv.refCheckLabel': 'Referencia a comprobar',
+      'inv.refCheckBtn': 'Comprobar',
+      'inv.refValidNational': '✓ Referencia nacional finlandesa válida',
+      'inv.refValidRF': '✓ Referencia RF válida',
+      'inv.refInvalid': '✗ Referencia no válida',
+      'inv.refUnknown': '✗ Formato desconocido',
+      'inv.new': 'Nueva factura',
+      'inv.print': 'Imprimir / Guardar en PDF',
+      'inv.confirmNew': '¿Crear una nueva factura? Se borrarán el cliente, las líneas y el mensaje – tus datos se conservan y el número se incrementa.',
+      'inv.autosave': 'El borrador se guarda automáticamente en tu navegador.',
+      'inv.savedAt': 'Guardado',
+      'inv.storageTitle': 'Almacenamiento de datos',
+      'inv.storageInfo': 'Tus datos se guardan solo en tu navegador — nunca se envían a ningún servidor.',
+      'inv.remember': 'Recordar mis datos en este dispositivo',
+      'inv.clearSaved': 'Borrar datos guardados',
+      'inv.confirmClear': '¿Borrar todos los datos guardados (borrador y tus datos)? No se puede deshacer.',
+      'inv.confirmRememberOff': '¿Desactivar el guardado? Se borrarán todos los datos guardados del navegador.',
+      'inv.storageOff': 'No se está guardando nada – el guardado está desactivado.',
+      'inv.cleared': 'Datos guardados borrados.',
+      'print.title': 'FACTURA',
+      'print.number': 'Nº factura',
+      'print.date': 'Fecha',
+      'print.due': 'Vencimiento',
+      'print.terms': 'Plazo de pago',
+      'print.days': 'días',
+      'print.client': 'Cliente',
+      'print.desc': 'Concepto',
+      'print.qty': 'Cant.',
+      'print.unit': 'Ud.',
+      'print.unitPrice': 'Precio unit. €',
+      'print.vat': 'IVA %',
+      'print.sum': 'Total €',
+      'print.net': 'Base imp.',
+      'print.vatSum': 'IVA',
+      'print.total': 'Total a pagar',
+      'print.payment': 'Forma de pago',
+      'print.iban': 'Cuenta (IBAN)',
+      'print.ref': 'Referencia',
+      'print.refRf': 'Referencia RF',
+      'print.amount': 'Importe a pagar',
+      'print.bid': 'NIF/CIF',
+      'print.thanks': '¡Gracias por su confianza!',
+      'print.disclaimer': 'No es asesoramiento jurídico.',
+      'print.madeWith': 'Factura creada con Laskupaja – laskupaja.com',
+    },
   });
 
   /* ---------- constants & helpers ---------- */
@@ -247,6 +341,14 @@
   const LS_DATA_KEYS = [LS_DRAFT, LS_LAST_NO, LS_PROFILE];
   const DEFAULT_TERMS = 14;
 
+  /* Locale for Intl formatting (money, dates, times) per UI language. */
+  const LOCALES = {
+    fi: 'fi-FI',
+    en: 'en-IE',
+    es: 'es-ES',
+    de: 'de-DE',
+  };
+
   const $ = (sel) => document.querySelector(sel);
   const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 
@@ -256,13 +358,14 @@
   }
 
   function fmtMoney(cents) {
-    const locale = LP.i18n.getLang() === 'fi' ? 'fi-FI' : 'en-IE';
+    const locale = LOCALES[LP.i18n.getLang()] || 'en-IE';
     return new Intl.NumberFormat(locale, { style: 'currency', currency: 'EUR' }).format(cents / 100);
   }
 
   function fmtRate(rateStr) {
     const n = Number(rateStr);
-    return LP.i18n.getLang() === 'fi' ? String(n).replace('.', ',') + ' %' : n + '%';
+    const lang = LP.i18n.getLang();
+    return lang === 'en' ? n + '%' : String(n).replace('.', ',') + ' %';
   }
 
   function fmtDate(iso) {
@@ -270,7 +373,7 @@
     const [y, m, d] = iso.split('-').map(Number);
     if (!y || !m || !d) return iso;
     const dt = new Date(y, m - 1, d);
-    return dt.toLocaleDateString(LP.i18n.getLang() === 'fi' ? 'fi-FI' : 'en-GB', {
+    return dt.toLocaleDateString(LOCALES[LP.i18n.getLang()] || 'en-GB', {
       day: 'numeric', month: 'short', year: 'numeric',
     });
   }
@@ -595,7 +698,7 @@
       lsSet(LS_LAST_NO, data.meta.number.trim());
     }
     const note = $('#autosave-note');
-    const time = new Date().toLocaleTimeString(LP.i18n.getLang() === 'fi' ? 'fi-FI' : 'en-GB', {
+    const time = new Date().toLocaleTimeString(LOCALES[LP.i18n.getLang()] || 'en-GB', {
       hour: '2-digit', minute: '2-digit',
     });
     note.textContent = t('inv.savedAt') + ' ' + time;

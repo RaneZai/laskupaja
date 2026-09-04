@@ -1,5 +1,5 @@
 /* ============================================================
- * Laskupaja – i18n runtime (FI default, EN secondary)
+ * Laskupaja – i18n runtime (FI default, EN/ES/DE secondary)
  * - Strings live in dictionaries; pages mark elements with
  *   data-i18n="key" (textContent), data-i18n-placeholder="key",
  *   data-i18n-title="key", data-i18n-label="key" (sets data-label
@@ -21,6 +21,22 @@
    * that opt-out wipes personal data keys only (see LS_DATA_KEYS in
    * js/invoice.js), and the spec explicitly allows the language preference
    * to survive the wipe. */
+
+  /* Supported languages. FI/EN is the original pair (default 'fi');
+   * ES and DE pages set <html data-lp-lang="es|de"> for their default. */
+  const LANGS = ['fi', 'en', 'es'];
+
+  /* Which languages each site family may show. The FI and EN sites share
+   * the FI/EN pair (historic behaviour); the ES and DE sites pair their own
+   * language with English. A stored choice is honoured only inside the
+   * current family, so an FI/EN choice never hijacks an ES page and vice
+   * versa. */
+  const FAMILY = {
+    fi: ['fi', 'en'],
+    en: ['fi', 'en'],
+    es: ['es', 'en'],
+    de: ['de', 'en'],
+  };
 
   /* Shared strings used by every page. */
   const SHARED = {
@@ -55,27 +71,47 @@
       'common.copy': 'Copy',
       'common.copied': 'Copied ✓',
     },
+    es: {
+      'nav.home': 'Inicio',
+      'nav.invoice': 'Factura',
+      'nav.vat': 'Calculadora de IVA',
+      'footer.disclaimer':
+        'No es asesoramiento jurídico. Revisa los datos de la factura antes de enviarla.',
+      'footer.sources': 'Tipos de IVA 2026: fuentes oficiales',
+      'footer.privacy':
+        'Todo se procesa únicamente en tu navegador – nada se envía a ningún servidor.',
+      /* Finnish 2026 rate labels (shown only if an ES page ever runs with
+       * the fixed FI option list; the /es/ generator uses IVA presets). */
+      'vat.255': '25,5 % – general (Finlandia)',
+      'vat.135': '13,5 % – reducido (Finlandia; desde 1.1.2026, antes 14 %)',
+      'vat.10': '10 % – p. ej. libros, medicamentos, alojamiento',
+      'vat.0': '0 % – exento',
+      'common.copy': 'Copiar',
+      'common.copied': 'Copiado ✓',
+    },
   };
 
-  const dicts = {
-    fi: Object.assign({}, SHARED.fi),
-    en: Object.assign({}, SHARED.en),
-  };
+  const dicts = {};
+  LANGS.forEach((l) => { dicts[l] = Object.assign({}, SHARED[l]); });
 
   /* Page-level default: /en/ pages set data-lp-lang="en" on <html>.
    * Used only when the visitor has made no explicit choice (no stored
-   * value). Finnish pages have no attribute, so their default stays 'fi'. */
+   * value). Finnish pages have no attribute, so their default stays 'fi'.
+   * ES/DE generator pages use data-lp-lang="es" / "de" the same way. */
   function defaultLang() {
-    return document.documentElement.getAttribute('data-lp-lang') === 'en' ? 'en' : 'fi';
+    const v = document.documentElement.getAttribute('data-lp-lang');
+    return LANGS.indexOf(v) !== -1 ? v : 'fi';
   }
 
   function readStoredLang() {
+    const family = FAMILY[defaultLang()];
     try {
       const v = localStorage.getItem(STORAGE_KEY);
-      return v === 'en' || v === 'fi' ? v : defaultLang();
+      if (v && family.indexOf(v) !== -1) return v;
     } catch (e) {
-      return defaultLang();
+      /* private mode */
     }
+    return defaultLang();
   }
 
   let lang = readStoredLang();
@@ -110,7 +146,7 @@
   }
 
   function setLang(next) {
-    if (next !== 'fi' && next !== 'en') return;
+    if (FAMILY[defaultLang()].indexOf(next) === -1) return;
     if (next === lang) return;
     lang = next;
     try {
@@ -124,8 +160,9 @@
 
   LP.i18n = {
     register(pageDicts) {
-      Object.assign(dicts.fi, pageDicts.fi || {});
-      Object.assign(dicts.en, pageDicts.en || {});
+      Object.keys(pageDicts).forEach((l) => {
+        if (dicts[l]) Object.assign(dicts[l], pageDicts[l] || {});
+      });
     },
     t,
     apply,
