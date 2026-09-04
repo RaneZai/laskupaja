@@ -68,6 +68,9 @@
       'inv.netLabel': 'veroton',
       'inv.pricesInclNote': 'Hinnat tulkitaan ALV sisältäviksi.',
       'inv.pricesExclNote': 'Hinnat ovat verottomia; ALV lisätään päälle.',
+      'inv.reverseCharge': 'EU:käänteinen verovelvollisuus (B2B, 0 %)',
+      'inv.rcHint': 'Kaikkien rivien ALV pakotetaan 0 %:iin ja laskuun tulee käänteisen verovelvollisuuden vaadittava merkintä.',
+      'inv.rcAnnotation': 'Käänteinen verovelvollisuus — veron maksaa ostaja (neuvoston direktiivi 2006/112/EY, 196 art.)',
       'inv.ref': 'Viitenumero',
       'inv.refNational': 'Kansallinen viitenumero',
       'inv.refRF': 'Kansainvälinen RF-viite (ISO 11649)',
@@ -163,6 +166,9 @@
       'inv.netLabel': 'net',
       'inv.pricesInclNote': 'Prices are treated as VAT-inclusive.',
       'inv.pricesExclNote': 'Prices are net; VAT is added on top.',
+      'inv.reverseCharge': 'EU reverse charge (B2B, 0 %)',
+      'inv.rcHint': 'All line VAT is forced to 0% and the required reverse-charge note is added to the invoice.',
+      'inv.rcAnnotation': 'VAT reverse charged — recipient liable for VAT (Directive 2006/112/EC art. 196)',
       'inv.ref': 'Payment reference',
       'inv.refNational': 'Finnish national reference',
       'inv.refRF': 'International RF reference (ISO 11649)',
@@ -258,6 +264,9 @@
       'inv.netLabel': 'base imponible',
       'inv.pricesInclNote': 'Los precios se tratan como IVA incluido.',
       'inv.pricesExclNote': 'Los precios van sin IVA; el IVA se añade encima.',
+      'inv.reverseCharge': 'Autoliquidación inversa del IVA (UE, 0 %)',
+      'inv.rcHint': 'El IVA de todas las líneas se fija en 0 % y la factura incluye la mención obligatoria de autoliquidación inversa.',
+      'inv.rcAnnotation': 'IVA Autoliquidación inversa — destinatario obligado al pago (Directiva 2006/112/CE art. 196)',
       'inv.ref': 'Referencia de pago',
       'inv.refNational': 'Referencia nacional finlandesa',
       'inv.refRF': 'Referencia internacional RF (ISO 11649)',
@@ -353,6 +362,9 @@
       'inv.netLabel': 'netto',
       'inv.pricesInclNote': 'Preise gelten als inkl. MwSt.',
       'inv.pricesExclNote': 'Preise sind netto; die MwSt. wird aufgeschlagen.',
+      'inv.reverseCharge': 'Umkehrung der Steuerschuldnerschaft (EU, 0 %)',
+      'inv.rcHint': 'Die MwSt. aller Positionen wird auf 0 % gesetzt und die Rechnung erhält den vorgeschriebenen Hinweis zur Umkehrung der Steuerschuldnerschaft.',
+      'inv.rcAnnotation': 'Umkehrung der Steuerschuldnerschaft — Leistungsempfänger schuldet die Steuer (RL 2006/112/EG Art. 196)',
       'inv.ref': 'Zahlungsreferenz',
       'inv.refNational': 'Finnische nationale Referenz',
       'inv.refRF': 'Internationale RF-Referenz (ISO 11649)',
@@ -573,6 +585,41 @@
     return valid[0];
   }
 
+  /* ---------- EU reverse charge (B2B, 0 %) ---------- */
+
+  /* While the reverse-charge checkbox (#reverseCharge) is on, every line's
+   * VAT is forced to 0 % (Directive 2006/112/EC art. 196: the recipient is
+   * liable for the VAT) and the print view carries the mandatory annotation.
+   * Each row select remembers its previous rate in data-prev-vat so
+   * unchecking restores the invoice as it was. */
+  function rcOn() {
+    const cb = $('#reverseCharge');
+    return !!(cb && cb.checked);
+  }
+
+  function applyReverseCharge(remember) {
+    const on = rcOn();
+    const profileSel = $('#profileVat');
+    if (profileSel) profileSel.disabled = on;
+    $$('#items-body .item-row').forEach((tr) => {
+      const sel = tr.querySelector('.ri-vat');
+      if (!sel) return;
+      if (on) {
+        if (remember && sel.value !== '0' && !sel.dataset.prevVat) {
+          sel.dataset.prevVat = sel.value;
+        }
+        sel.value = '0';
+        sel.disabled = true;
+      } else {
+        sel.disabled = false;
+        if (sel.dataset.prevVat) {
+          sel.value = sel.dataset.prevVat;
+          delete sel.dataset.prevVat;
+        }
+      }
+    });
+  }
+
   function addRow(item) {
     const item_ = item || {};
     const tr = document.createElement('tr');
@@ -582,7 +629,7 @@
       `<td data-i18n-label="inv.qty"><input type="text" inputmode="decimal" class="ri-qty" value="${esc(item_.qty != null ? item_.qty : 1)}"></td>`,
       `<td data-i18n-label="inv.unit"><input type="text" list="unit-list" class="ri-unit" value="${esc(item_.unit || (CTX && CTX.unit) || 'kpl')}"></td>`,
       `<td data-i18n-label="inv.unitPrice"><input type="text" inputmode="decimal" class="ri-price" placeholder="0,00" value="${esc(item_.price != null ? item_.price : '')}"></td>`,
-      `<td data-i18n-label="inv.vatCol"><select class="ri-vat">${vatSelectHTML(item_.vat || defaultVat())}</select></td>`,
+      `<td data-i18n-label="inv.vatCol"><select class="ri-vat"${rcOn() ? ' disabled' : ''}>${vatSelectHTML(rcOn() ? '0' : (item_.vat || defaultVat()))}</select></td>`,
       `<td class="col-sum" data-i18n-label="inv.sum"><span class="ri-total">–</span></td>`,
       `<td><button type="button" class="btn btn-ghost remove-row" data-i18n-aria="inv.removeRow" aria-label="×" title="×">×</button></td>`,
     ].join('');
@@ -636,6 +683,9 @@
   function renderTotals() {
     const pricesIncl = $('#pricesInclVat').checked;
     const totals = computeTotals(collectItems(), pricesIncl);
+    const rcNote = rcOn()
+      ? `<p class="hint rc-note">${esc(t('inv.rcAnnotation'))}</p>`
+      : '';
     const rateKeys = Object.keys(totals.byRate).sort((a, b) => Number(b) - Number(a));
     const breakdown = rateKeys
       .map(
@@ -651,7 +701,9 @@
       `<tr class="sub"><td>${esc(t('inv.vatTotal'))}</td><td>${esc(fmtMoney(totals.vatC))}</td></tr>` +
       `<tr class="grand"><td>${esc(t('inv.grossTotal'))}</td><td>${esc(fmtMoney(totals.grossC))}</td></tr>` +
       `</table>` +
-      `<p class="hint">${esc(pricesIncl ? t('inv.pricesInclNote') : t('inv.pricesExclNote'))}</p></div>`;
+      `<p class="hint">${esc(pricesIncl ? t('inv.pricesInclNote') : t('inv.pricesExclNote'))}</p>` +
+      rcNote +
+      `</div>`;
   }
 
   /* ---------- references ---------- */
@@ -752,6 +804,7 @@
       },
       notes: $('#invoiceNotes').value,
       pricesIncl: $('#pricesInclVat').checked,
+      reverseCharge: rcOn(),
       items: collectItems(),
     };
   }
@@ -772,6 +825,7 @@
     set('#dueDate', d.meta && d.meta.due);
     set('#invoiceNotes', d.notes);
     if (d.pricesIncl != null) $('#pricesInclVat').checked = !!d.pricesIncl;
+    if (d.reverseCharge != null) $('#reverseCharge').checked = !!d.reverseCharge;
     const items = Array.isArray(d.items) && d.items.length ? d.items : [{}];
     $('#items-body').innerHTML = '';
     items.forEach((it) => addRow(it));
@@ -878,6 +932,7 @@
       `<tr><td>${esc(t('print.net'))}</td><td class="num">${esc(fmtMoney(totals.netC))}</td></tr>` +
       `<tr><td>${esc(t('print.vatSum'))}</td><td class="num">${esc(fmtMoney(totals.vatC))}</td></tr>` +
       `<tr class="grand"><td>${esc(t('print.total'))}</td><td class="num">${esc(fmtMoney(totals.grossC))}</td></tr></table>` +
+      (rcOn() ? `<p class="pv-rc">${esc(t('inv.rcAnnotation'))}</p>` : '') +
       `<div class="pv-payment"><h3>${esc(t('print.payment'))}</h3><dl>` +
       `<dt>${esc(t('print.iban'))}</dt><dd>${esc(d.sender.iban || '—')}</dd>` +
       `<dt>${esc(t('print.ref'))}</dt><dd>${refs && refs.national ? esc(refs.national) : '—'}</dd>` +
@@ -939,6 +994,7 @@
         $('#paymentTerms').value = defaultTerms();
       }
     }
+    if (rcOn()) applyReverseCharge(false); /* restored draft had RC on: force 0 % + lock selects */
     if (!$('#items-body .item-row')) addRow();
     if (!$('#invoiceDate').value) $('#invoiceDate').value = todayISO();
     if (!$('#paymentTerms').value) $('#paymentTerms').value = defaultTerms();
@@ -974,6 +1030,14 @@
     $('#invoiceDate').addEventListener('change', syncDueFromTerms);
     $('#paymentTerms').addEventListener('change', syncDueFromTerms);
     $('#dueDate').addEventListener('change', syncTermsFromDue);
+
+    /* reverse charge (B2B, 0 %): force all line VAT to zero + annotate */
+    $('#reverseCharge').addEventListener('change', () => {
+      applyReverseCharge(true);
+      renderTotals();
+      buildPrintView();
+      scheduleSave();
+    });
 
     /* rows */
     $('#add-row').addEventListener('click', () => { addRow(); saveDraft(); });
@@ -1016,6 +1080,7 @@
       const next = Numbering.nextInvoiceNumber(lastNo || null);
       lsDel(LS_DRAFT);
       $('#invoice-form').reset();
+      applyReverseCharge(false); /* reset unchecked RC: re-enable the VAT selects */
       applyProfile(profile);
       $('#items-body').innerHTML = '';
       addRow(); /* picks up the profile default VAT */

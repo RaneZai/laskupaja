@@ -194,4 +194,60 @@ if errors:
     for e in errors:
         print(" -", e)
     sys.exit(1)
+
+# ---------- 8. shipped-site assertions (sitemap, cross-links, reverse charge) ----------
+SITEMAP_REQUIRED = [
+    "https://laskupaja.com/es/",
+    "https://laskupaja.com/es/factura/",
+    "https://laskupaja.com/de/",
+    "https://laskupaja.com/de/rechnung/",
+]
+sm = (ROOT / "sitemap.xml").read_text()
+for loc in SITEMAP_REQUIRED:
+    if f"<loc>{loc}</loc>" not in sm:
+        errors.append(f"sitemap.xml: missing {loc}")
+print(f"OK  sitemap.xml contains the {len(SITEMAP_REQUIRED)} new URLs")
+
+CROSS_LINKS = {
+    "en/vat/es/index.html": ("/es/factura/", "\u00bfPrefieres la factura en espa\u00f1ol?"),
+    "en/vat/de/index.html": ("/de/rechnung/", "Rechnung auf Deutsch?"),
+    "index.html": ("es/", "Espa\u00f1ol"),
+    "en/index.html": ("../de/", "Deutsch"),
+}
+for page, (href, needle) in CROSS_LINKS.items():
+    html = (ROOT / page).read_text()
+    if f'href="{href}"' not in html or needle not in html:
+        errors.append(f"{page}: expected cross-link to {href} ({needle!r}) not found")
+print("OK  cross-links: VAT guides -> ES/DE generators; FI/EN homes -> language links")
+
+GENERATORS = ["lasku/index.html", "en/invoice/index.html", "es/factura/index.html",
+              "de/rechnung/index.html"]
+for page in GENERATORS:
+    html = (ROOT / page).read_text()
+    if 'id="reverseCharge"' not in html or 'data-i18n="inv.reverseCharge"' not in html:
+        errors.append(f"{page}: reverse-charge checkbox (#reverseCharge + label) missing")
+print("OK  reverse-charge checkbox present on all 4 generators")
+
+RC_LABELS = {
+    "fi": "EU:k\u00e4\u00e4nteinen verovelvollisuus (B2B, 0 %)",
+    "en": "EU reverse charge (B2B, 0 %)",
+    "es": "Autoliquidaci\u00f3n inversa del IVA (UE, 0 %)",
+    "de": "Umkehrung der Steuerschuldnerschaft (EU, 0 %)",
+}
+RC_ANNOTATIONS = {
+    "fi": "2006/112/EY, 196 art.",
+    "en": "Directive 2006/112/EC art. 196",
+    "es": "Directiva 2006/112/CE art. 196",
+    "de": "RL 2006/112/EG Art. 196",
+}
+inv_js = (ROOT / "js/invoice.js").read_text()
+for loc, label in RC_LABELS.items():
+    if f"'{label}'" not in inv_js:
+        errors.append(f"js/invoice.js: reverse-charge label for '{loc}' missing: {label}")
+for loc, ann in RC_ANNOTATIONS.items():
+    if f"'inv.rcAnnotation'" not in inv_js or ann not in inv_js:
+        errors.append(f"js/invoice.js: art. 196 annotation for '{loc}' missing")
+print("OK  reverse-charge label + art.196 annotation strings in all 4 locales")
+
+
 print("ALL INTEGRITY CHECKS PASSED")

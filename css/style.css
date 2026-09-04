@@ -446,6 +446,13 @@ table.items select:focus { border-color: var(--accent); background: #fff; }
   padding-top: 0.55rem;
 }
 
+/* Reverse-charge annotation in the on-screen summary */
+.totals-box .rc-note {
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0.45rem 0 0;
+}
+
 /* ---------- Reference numbers ---------- */
 
 .ref-grid {
@@ -691,6 +698,14 @@ table.items select:focus { border-color: var(--accent); background: #fff; }
   #print-view .num { text-align: right; font-variant-numeric: tabular-nums; }
 
   #print-view .pv-totals { width: 70pt; margin-left: auto; }
+
+  #print-view .pv-rc {
+    margin: 0 0 12pt;
+    padding: 6pt 8pt;
+    border: 1pt solid #000;
+    font-size: 9.5pt;
+    font-weight: 600;
+  }
 
   #print-view .pv-notes {
     margin: 0 0 12pt;

@@ -31,6 +31,12 @@ browser: no signup, no server, no tracking, no external network calls.
   rate** (net / VAT / gross, EUR only).
 - **VAT options (2026-correct)**: 25,5 % (yleinen), 13,5 % (alennettu,
   1.1.2026 alkaen – aiemmin 14 %), 10 %, 0 %. Labelled in the UI and cited.
+- **EU reverse charge (B2B, 0 %)**: checkbox on every generator locale
+  (FI/EN/ES/DE). When enabled, all line VAT is forced to 0 % and the
+  invoice carries the mandatory art. 196 annotation (Directive
+  2006/112/EC) in the print view and summary; per-row rates are
+  remembered and restored on uncheck, and the state persists with the
+  draft.
 - **Viitenumero**: both the Finnish national creditor reference (weights 7-3-1,
   mod 10) and the international **RF reference (ISO 11649)** – generated from
   the invoice number, plus a paste-and-check validator that auto-detects the
