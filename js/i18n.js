@@ -62,12 +62,19 @@
     en: Object.assign({}, SHARED.en),
   };
 
+  /* Page-level default: /en/ pages set data-lp-lang="en" on <html>.
+   * Used only when the visitor has made no explicit choice (no stored
+   * value). Finnish pages have no attribute, so their default stays 'fi'. */
+  function defaultLang() {
+    return document.documentElement.getAttribute('data-lp-lang') === 'en' ? 'en' : 'fi';
+  }
+
   function readStoredLang() {
     try {
       const v = localStorage.getItem(STORAGE_KEY);
-      return v === 'en' || v === 'fi' ? v : 'fi';
+      return v === 'en' || v === 'fi' ? v : defaultLang();
     } catch (e) {
-      return 'fi';
+      return defaultLang();
     }
   }
 

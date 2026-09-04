@@ -127,14 +127,14 @@
       'inv.myDetailsHint': 'These details are saved in your browser and prefilled into future invoices.',
       'inv.senderName': 'Name or company *',
       'inv.namePh': 'e.g. Jane Doe / Doe Ltd',
-      'inv.senderBid': 'Business ID (Y-tunnus)',
+      'inv.senderBid': 'Business ID / VAT number',
       'inv.address': 'Address',
       'inv.iban': 'IBAN account number',
       'inv.defaultTerms': 'Default payment terms (days)',
       'inv.defaultVat': 'Default VAT % for new rows',
       'inv.client': 'Client',
       'inv.clientName': 'Name or company *',
-      'inv.clientBid': 'Business ID (optional)',
+      'inv.clientBid': 'Business ID / VAT number (optional)',
       'inv.details': 'Invoice details',
       'inv.number': 'Invoice number',
       'inv.date': 'Invoice date',
@@ -225,6 +225,16 @@
     { value: '0', key: 'vat.0' },
   ];
 
+  /* Country rate context (set only by /en/invoice/ via js/vat-context.js,
+   * built from ?country=CC&vat=XX or the stored laskupaja:country).
+   * Null on /lasku/, so Finnish pages keep the fixed 2026 options above. */
+  const CTX = window.LP_VAT_CONTEXT || null;
+
+  function vatOptions() {
+    if (!CTX) return VAT_OPTIONS;
+    return CTX.rates.map((v) => ({ value: String(v), label: v + '%', key: null }));
+  }
+
   const LS_DRAFT = 'laskupaja:draft';
   const LS_LAST_NO = 'laskupaja:lastInvoiceNo';
   const LS_PROFILE = 'laskupaja:profile';   /* business profile, separate from the draft */
@@ -294,6 +304,18 @@
     try { localStorage.removeItem(key); } catch (e) { /* noop */ }
   }
 
+  /* Replace the Finnish VAT options with the preset country's rates and
+   * preselect ?vat=XX (or the standard rate). /en/invoice/ only (CTX set). */
+  function applyVatContext() {
+    const opts = vatOptions();
+    $('#profileVat').innerHTML = opts
+      .map((o) => `<option value="${o.value}">${esc(o.label)}</option>`)
+      .join('');
+    if (CTX.defaultVat && opts.some((o) => o.value === CTX.defaultVat)) {
+      $('#profileVat').value = CTX.defaultVat;
+    }
+  }
+
   /* ---------- storage opt-out ---------- */
 
   /* Remembering is ON by default; only an explicit '0' opts out. */
@@ -325,9 +347,14 @@
   /* ---------- line rows ---------- */
 
   function vatSelectHTML(selected) {
-    return VAT_OPTIONS.map(
-      (o) => `<option value="${o.value}"${o.value === selected ? ' selected' : ''} data-i18n="${o.key}"></option>`
-    ).join('');
+    return vatOptions()
+      .map((o) => {
+        const sel = o.value === selected ? ' selected' : '';
+        return o.key
+          ? `<option value="${o.value}"${sel} data-i18n="${o.key}"></option>`
+          : `<option value="${o.value}"${sel}>${esc(o.label)}</option>`;
+      })
+      .join('');
   }
 
   /* Current profile defaults (fallbacks match the HTML defaults). */
@@ -338,7 +365,11 @@
 
   function defaultVat() {
     const el = $('#profileVat');
-    return (el && el.value) || '25.5';
+    const valid = vatOptions().map((o) => o.value);
+    /* clamp: stored profile values from the other page (e.g. Finnish 25.5
+     * on a DE-preset page) fall back to the first option */
+    if (el && valid.indexOf(el.value) !== -1) return el.value;
+    return valid[0];
   }
 
   function addRow(item) {
@@ -348,7 +379,7 @@
     tr.innerHTML = [
       `<td class="col-desc" data-i18n-label="inv.desc"><input type="text" class="ri-desc" value="${esc(item_.desc || '')}" data-i18n-placeholder="inv.descPh"></td>`,
       `<td data-i18n-label="inv.qty"><input type="text" inputmode="decimal" class="ri-qty" value="${esc(item_.qty != null ? item_.qty : 1)}"></td>`,
-      `<td data-i18n-label="inv.unit"><input type="text" list="unit-list" class="ri-unit" value="${esc(item_.unit || 'kpl')}"></td>`,
+      `<td data-i18n-label="inv.unit"><input type="text" list="unit-list" class="ri-unit" value="${esc(item_.unit || (CTX && CTX.unit) || 'kpl')}"></td>`,
       `<td data-i18n-label="inv.unitPrice"><input type="text" inputmode="decimal" class="ri-price" placeholder="0,00" value="${esc(item_.price != null ? item_.price : '')}"></td>`,
       `<td data-i18n-label="inv.vatCol"><select class="ri-vat">${vatSelectHTML(item_.vat || defaultVat())}</select></td>`,
       `<td class="col-sum" data-i18n-label="inv.sum"><span class="ri-total">–</span></td>`,
@@ -687,6 +718,7 @@
   /* ---------- init & events ---------- */
 
   function init() {
+    if (CTX) applyVatContext(); /* country options before profile/draft load */
     /* default or restored state */
     const remember = rememberOn();
     refreshStorageUI(); /* checkbox reflects the stored opt-out */

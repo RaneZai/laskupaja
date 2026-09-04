@@ -11,6 +11,18 @@ PAGES = {
     "index.html": ["js/i18n.js", "js/home.js"],
     "lasku/index.html": ["js/i18n.js", "js/numbering.js", "js/invoice.js"],
     "alv/index.html": ["js/i18n.js", "js/calculator.js"],
+    # English/EU layer (static EN pages carry no data-i18n attrs; the
+    # invoice entry loads the same dicts plus js/vat-context.js).
+    "en/index.html": [],
+    "en/invoice/index.html": ["js/i18n.js", "js/vat-context.js", "js/numbering.js", "js/invoice.js"],
+    "en/vat/de/index.html": [],
+    "en/vat/fr/index.html": [],
+    "en/vat/it/index.html": [],
+    "en/vat/es/index.html": [],
+    "en/vat/nl/index.html": [],
+    "en/vat/pl/index.html": [],
+    "en/vat/se/index.html": [],
+    "en/vat/ie/index.html": [],
 }
 VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input",
         "link", "meta", "param", "source", "track", "wbr"}

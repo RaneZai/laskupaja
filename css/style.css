@@ -744,6 +744,19 @@ table.items select:focus { border-color: var(--accent); background: #fff; }
   }
 }
 
+/* ---------- Print: content pages without a #print-view ----------
+   The invoice print rules above hide everything except #print-view, which
+   would blank pages that have no print view (EN homepage, country guides).
+   Pages opting in via <body class="guide-page"> print their content and
+   drop the site chrome instead. Finnish pages are unaffected. */
+@media print {
+  body.guide-page > *:not(#print-view) { display: revert !important; }
+  body.guide-page .site-header,
+  body.guide-page .site-footer,
+  body.guide-page .no-print { display: none !important; }
+  body.guide-page .card { box-shadow: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
   html { scroll-behavior: auto; }
