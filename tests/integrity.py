@@ -11,20 +11,8 @@ PAGES = {
     "index.html": ["js/i18n.js", "js/home.js"],
     "lasku/index.html": ["js/i18n.js", "js/numbering.js", "js/invoice.js"],
     "alv/index.html": ["js/i18n.js", "js/calculator.js"],
-    # English/EU layer (static EN pages carry no data-i18n attrs; the
-    # invoice entry loads the same dicts plus js/vat-context.js).
-    "en/index.html": [],
-    "en/invoice/index.html": ["js/i18n.js", "js/vat-context.js", "js/numbering.js", "js/invoice.js"],
-    "en/vat/de/index.html": [],
-    "en/vat/fr/index.html": [],
-    "en/vat/it/index.html": [],
-    "en/vat/es/index.html": [],
-    "en/vat/nl/index.html": [],
-    "en/vat/pl/index.html": [],
-    "en/vat/se/index.html": [],
-    "en/vat/ie/index.html": [],
-    # Spanish site (static homepage; the generator loads the shared engine
-    # plus the country-preset context, like /en/invoice/).
+    # Spanish site (static homepage; generator loads the shared engine plus
+    # the country-preset context).
     "es/index.html": [],
     "es/factura/index.html": ["js/i18n.js", "js/vat-context.js", "js/numbering.js", "js/invoice.js"],
     # German site (same pattern as the Spanish site).
@@ -105,8 +93,7 @@ else:
     errors.append(f"css braces: {{={css.count('{')} }}={css.count('}')}")
 
 # ---------- 5. print-view is direct child of body (print CSS depends on it) ----------
-for lv in ["lasku/index.html", "en/invoice/index.html", "es/factura/index.html",
-           "de/rechnung/index.html"]:
+for lv in ["lasku/index.html", "es/factura/index.html", "de/rechnung/index.html"]:
     src = (ROOT / lv).read_text()
     if re.search(r"<body>[\s\S]*?<div id=\"print-view\"", src):
         print(f"OK  #print-view present (direct child of body): {lv}")
@@ -197,6 +184,9 @@ if errors:
 
 # ---------- 8. shipped-site assertions (sitemap, cross-links, reverse charge) ----------
 SITEMAP_REQUIRED = [
+    "https://laskupaja.com/",
+    "https://laskupaja.com/lasku/",
+    "https://laskupaja.com/alv/",
     "https://laskupaja.com/es/",
     "https://laskupaja.com/es/factura/",
     "https://laskupaja.com/de/",
@@ -206,27 +196,28 @@ sm = (ROOT / "sitemap.xml").read_text()
 for loc in SITEMAP_REQUIRED:
     if f"<loc>{loc}</loc>" not in sm:
         errors.append(f"sitemap.xml: missing {loc}")
-print(f"OK  sitemap.xml contains the {len(SITEMAP_REQUIRED)} new URLs")
+print(f"OK  sitemap.xml contains all {len(SITEMAP_REQUIRED)} public URLs")
+
+if "/en/" in sm:
+    errors.append("sitemap.xml: removed /en/ routes are still present")
 
 CROSS_LINKS = {
-    "en/vat/es/index.html": ("/es/factura/", "\u00bfPrefieres la factura en espa\u00f1ol?"),
-    "en/vat/de/index.html": ("/de/rechnung/", "Rechnung auf Deutsch?"),
-    "index.html": ("es/", "Espa\u00f1ol"),
-    "en/index.html": ("../de/", "Deutsch"),
+    "index.html": ("es/factura/", "Espa\u00f1ol"),
+    "de/index.html": ("rechnung/", "Rechnung erstellen"),
+    "es/index.html": ("factura/", "Crear una factura"),
 }
 for page, (href, needle) in CROSS_LINKS.items():
     html = (ROOT / page).read_text()
     if f'href="{href}"' not in html or needle not in html:
         errors.append(f"{page}: expected cross-link to {href} ({needle!r}) not found")
-print("OK  cross-links: VAT guides -> ES/DE generators; FI/EN homes -> language links")
+print("OK  cross-links: main and localized homepages reach their generators")
 
-GENERATORS = ["lasku/index.html", "en/invoice/index.html", "es/factura/index.html",
-              "de/rechnung/index.html"]
+GENERATORS = ["lasku/index.html", "es/factura/index.html", "de/rechnung/index.html"]
 for page in GENERATORS:
     html = (ROOT / page).read_text()
     if 'id="reverseCharge"' not in html or 'data-i18n="inv.reverseCharge"' not in html:
         errors.append(f"{page}: reverse-charge checkbox (#reverseCharge + label) missing")
-print("OK  reverse-charge checkbox present on all 4 generators")
+print("OK  reverse-charge checkbox present on all 3 generators")
 
 RC_LABELS = {
     "fi": "EU:k\u00e4\u00e4nteinen verovelvollisuus (B2B, 0 %)",

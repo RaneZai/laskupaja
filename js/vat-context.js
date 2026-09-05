@@ -1,6 +1,5 @@
 /* ============================================================
- * Laskupaja – country VAT presets for the international generator
- * pages (/en/invoice/, /es/factura/, /de/rechnung/).
+ * Laskupaja – VAT presets for the Spanish and German generators.
  * Loaded before js/invoice.js. Reads ?country=CC&vat=XX:
  *  - valid CC  -> stored under laskupaja:country and applied
  *  - no CC     -> the page's own default (e.g. data-lp-country="ES" on
@@ -9,7 +8,7 @@
  * which js/invoice.js uses to swap the Finnish VAT options.
  * The /lasku/ page never loads this file, so FI behavior is unchanged.
  *
- * Rates verified 2026-09-03 – sources are cited on each /en/vat/[cc]/ page.
+ * Rates verified 2026-09-03 – primary sources are cited on the localized pages.
  * Standard rate first, then the main reduced rates, 0 last.
  *
  * laskupaja:country is a non-personal UI setting like laskupaja:lang
@@ -22,13 +21,7 @@
 
   var COUNTRY_RATES = {
     DE: ['19', '7', '0'],
-    FR: ['20', '10', '5.5', '2.1', '0'],
-    IT: ['22', '10', '5', '4', '0'],
     ES: ['21', '10', '4', '0'],
-    NL: ['21', '9', '0'],
-    PL: ['23', '8', '5', '0'],
-    SE: ['25', '12', '6', '0'],
-    IE: ['23', '13.5', '9', '4.8', '0'],
   };
 
   /* Default unit label for new invoice rows per country ('kpl' is the FI
@@ -58,7 +51,7 @@
   } else {
     /* Page-level default from <html data-lp-country="CC">: applied but
      * never stored, so visiting /es/factura/ does not rewrite the remembered
-     * country of the /en/ funnel (and vice versa). */
+     * country selected on the other localized generator. */
     var pageDefault = (document.documentElement.getAttribute('data-lp-country') || '')
       .trim()
       .toUpperCase();

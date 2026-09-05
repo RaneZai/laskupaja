@@ -1,7 +1,7 @@
 <!doctype html>
 <!-- Laskupaja deutsche Homepage: das Rechnungswerkzeug für deutschsprachige
      Freelancer und kleine Unternehmen. Statische deutsche Texte (das Werkzeug
-     selbst liegt auf /de/rechnung/). FI-Site: / · EN-Site: /en/ -->
+     selbst liegt auf /de/rechnung/). Weitere Sprachen: FI und ES. -->
 <html lang="de">
 <head>
   <meta charset="utf-8">
@@ -18,8 +18,8 @@
   <meta property="og:image" content="https://laskupaja.com/assets/og-cover.svg">
   <meta property="og:site_name" content="Laskupaja">
   <meta property="og:locale" content="de_DE">
-  <meta property="og:locale:alternate" content="en_GB">
   <meta property="og:locale:alternate" content="fi_FI">
+  <meta property="og:locale:alternate" content="es_ES">
   <meta name="theme-color" content="#1d4ed8">
 
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
@@ -33,9 +33,9 @@
     "alternateName": "Laskupaja – Rechnung erstellen kostenlos",
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Any",
-    "inLanguage": ["de", "en", "fi"],
+    "inLanguage": ["de", "fi", "es"],
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
-    "description": "Rechnung erstellen kostenlos als PDF mit den Umsatzsteuersätzen für Deutschland und weitere EU-Länder. Läuft im Browser, ohne Anmeldung."
+    "description": "Rechnung erstellen kostenlos als PDF mit den deutschen Umsatzsteuersätzen. Läuft im Browser, ohne Anmeldung."
   }
   </script>
     <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "d3a80783da61452e90a2a0feccff2794"}'></script>
@@ -59,8 +59,8 @@
       <nav class="main-nav" aria-label="Hauptmenü">
         <a class="nav-link active" href="./">Startseite</a>
         <a class="nav-link" href="rechnung/">Rechnung</a>
-        <a class="nav-link" href="../en/vat/de/">Deutschland-Guide</a>
-        <a class="nav-link" href="../en/" lang="en">English</a>
+        <a class="nav-link" href="../" lang="fi">Suomi</a>
+        <a class="nav-link" href="../es/" lang="es">Español</a>
       </nav>
     </div>
   </header>
@@ -73,7 +73,7 @@
       <p class="lead">Rechnungsvorlage in sauberem A4-Format ausfüllen, die Umsatzsteuersätze deines Landes wählen (Deutschland: 19 % und 7 %) und drucken oder als PDF speichern – alles im Browser. Ohne Installation, ohne Nutzungslimits, und deine Daten verlassen dein Gerät nie.</p>
       <div class="actions-row">
         <a class="btn btn-primary" href="rechnung/">Rechnung erstellen →</a>
-        <a class="btn btn-secondary" href="../en/vat/de/">MwSt. in Deutschland (Guide EN) →</a>
+        <a class="btn btn-secondary" href="#mwst-deutschland">Deutsche USt-Hinweise ↓</a>
       </div>
     </section>
 
@@ -94,13 +94,13 @@
 
     <section id="mwst-deutschland" aria-labelledby="mwst-deutschland-title">
       <h2 id="mwst-deutschland-title">Umsatzsteuer in Deutschland: Sätze 2026</h2>
-      <p class="hint" style="margin-top:-0.4rem;">Die geltenden USt-Sätze und eine Regel, die Kleinunternehmer kennen sollten – der vollständige Guide öffnet den Generator direkt mit dem deutschen Regelsatz von 19 %.</p>
+      <p class="hint" style="margin-top:-0.4rem;">Die geltenden USt-Sätze und eine Regel, die Kleinunternehmer kennen sollten.</p>
       <div class="tool-grid">
-        <a class="card tool-card" href="../en/vat/de/">
+        <div class="card tool-card">
           <h3><span aria-hidden="true">🇩🇪</span> Deutschland (USt)</h3>
           <p>19 % Regelsatz · 7 % reduziert. E-Rechnungs-Empfang seit 2025 Pflicht; §19 UStG beachten.</p>
-          <span class="go">Guide öffnen →</span>
-        </a>
+          <span class="go">Quellen siehe Seitenende</span>
+        </div>
         <a class="card tool-card" href="rechnung/">
           <h3><span aria-hidden="true">🧾</span> Direkt zum Generator</h3>
           <p>Die Rechnung startet mit den deutschen Sätzen: Rechnungsnummer, Rechnungsdatum, Fälligkeitsdatum, netto und brutto.</p>
@@ -110,7 +110,7 @@
     </section>
 
     <section class="notice" aria-label="Kleinunternehmerregelung">
-      <p><strong>Kleinunternehmer (§19 UStG):</strong> Wendest du die Kleinunternehmerregelung an, weist deine Rechnung keine Umsatzsteuer aus – im Generator einfach 0 % wählen und den Hinweis <em>„Kein Ausweis von Umsatzsteuer gem. §19 UStG“</em> in das Nachrichtenfeld schreiben. Details im <a href="../en/vat/de/">Deutschland-Guide</a>.</p>
+      <p><strong>Kleinunternehmer (§19 UStG):</strong> Wendest du die Kleinunternehmerregelung an, weist deine Rechnung keine Umsatzsteuer aus – im Generator einfach 0 % wählen und den Hinweis <em>„Kein Ausweis von Umsatzsteuer gem. §19 UStG“</em> in das Nachrichtenfeld schreiben.</p>
     </section>
 
     <section aria-labelledby="warum-title">
@@ -166,7 +166,7 @@
       <span>Keine Rechtsberatung. Prüfe die Rechnungsdaten vor dem Versenden.</span>
       <span>USt-Sätze 2026: <a href="https://www.gesetze-im-internet.de/ustg_1980/__12.html" target="_blank" rel="noopener">§12 UStG</a>; <a href="https://www.bundesfinanzministerium.de/Content/DE/FAQ/e-rechnung.html" target="_blank" rel="noopener">BMF – E-Rechnung</a>; Stand 3. September 2026.</span>
       <span>Alles wird nur in deinem Browser verarbeitet – nichts wird an einen Server gesendet.</span>
-      <span>Auch verfügbar: <a href="../" lang="fi">Suomeksi</a> · <a href="../en/" lang="en">English</a> · <a href="../es/" lang="es">Español</a></span>
+      <span>Auch verfügbar: <a href="../" lang="fi">Suomeksi</a> · <a href="../es/" lang="es">Español</a></span>
     </div>
   </footer>
 

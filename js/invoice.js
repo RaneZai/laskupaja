@@ -429,7 +429,7 @@
     { value: '0', key: 'vat.0' },
   ];
 
-  /* Country rate context (set only by /en/invoice/ via js/vat-context.js,
+  /* Country rate context (set by localized generators via js/vat-context.js,
    * built from ?country=CC&vat=XX or the stored laskupaja:country).
    * Null on /lasku/, so Finnish pages keep the fixed 2026 options above. */
   const CTX = window.LP_VAT_CONTEXT || null;
@@ -518,7 +518,7 @@
   }
 
   /* Replace the Finnish VAT options with the preset country's rates and
-   * preselect ?vat=XX (or the standard rate). /en/invoice/ only (CTX set). */
+   * preselect ?vat=XX (or the standard rate) when CTX is set. */
   function applyVatContext() {
     const opts = vatOptions();
     $('#profileVat').innerHTML = opts

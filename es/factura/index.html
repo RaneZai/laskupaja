@@ -1,8 +1,7 @@
 <!doctype html>
 <!-- Laskupaja – generador de facturas (español). Mismo motor que /lasku/
      (js/invoice.js); por defecto en español (html[data-lp-lang]) y con
-     tipos de IVA de España (html[data-lp-country], verificado 2026-09-03,
-     fuentes en /en/vat/es/). Admite ?country=CC&vat=XX como /en/invoice/. -->
+     tipos de IVA de España (html[data-lp-country], verificado 2026-09-03). -->
 <html lang="es" data-lp-lang="es" data-lp-country="ES">
 <head>
   <meta charset="utf-8">
@@ -27,12 +26,7 @@
   <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
   <link rel="stylesheet" href="../../css/style.css">
 
-  <!--
-    Tipos de IVA (verificados 2026-09-03, fuentes en /en/vat/es/):
-    - por defecto: España 21 % / 10 % / 4 % / 0 %
-    - ?country=CC&vat=XX: presets de otros países (DE, FR, IT, NL, PL, SE, IE)
-      o Finlandia 2026 sin parámetro country.
-  -->
+  <!-- Tipos de IVA de España, verificados 2026-09-03: 21 % / 10 % / 4 % / 0 %. -->
 
   <script src="../../js/reference.js" defer></script>
   <script src="../../js/numbering.js" defer></script>
@@ -60,7 +54,8 @@
       <nav class="main-nav" aria-label="Menú principal">
         <a class="nav-link" href="../" data-i18n="nav.home"></a>
         <a class="nav-link active" href="./" data-i18n="nav.invoice"></a>
-        <a class="nav-link" href="../../en/vat/es/">Guía IVA España</a>
+        <a class="nav-link" href="../../" lang="fi">Suomi</a>
+        <a class="nav-link" href="../../de/rechnung/" lang="de">Deutsch</a>
       </nav>
       <div class="lang-toggle" role="group" aria-label="Idioma / Language">
         <button type="button" data-lang-toggle="es" aria-pressed="true">ES</button>
@@ -75,7 +70,7 @@
 
     <!-- Nota de facturación en España (contenido estático de la página) -->
     <section class="notice" lang="es" aria-label="Nota sobre facturación en España">
-      <p><strong>España:</strong> la factura completa debe identificar a emisor y destinatario (NIF/CIF incluido); la <em>factura simplificada</em> (tipo tique) solo vale hasta 400 € IVA incluido (3.000 € en sectores autorizados). Tipos de IVA 2026: <strong>21 %</strong> general · <strong>10 %</strong> reducido · <strong>4 %</strong> superreducido. Más detalles en la <a href="../../en/vat/es/">guía de IVA en España</a> (en inglés).</p>
+      <p><strong>España:</strong> la factura completa debe identificar a emisor y destinatario (NIF/CIF incluido); la <em>factura simplificada</em> (tipo tique) solo vale hasta 400 € IVA incluido (3.000 € en sectores autorizados). Tipos de IVA 2026: <strong>21 %</strong> general · <strong>10 %</strong> reducido · <strong>4 %</strong> superreducido.</p>
     </section>
 
     <!-- Transparencia de almacenamiento (js/invoice.js) -->
@@ -269,7 +264,7 @@
       <span data-i18n="footer.disclaimer"></span>
       <span>Fuentes: <a href="https://sede.agenciatributaria.gob.es/Sede/iva/calculo-iva-repercutido-clientes/tipos-impositivos-iva.html" target="_blank" rel="noopener">Agencia Tributaria – tipos de IVA</a> (2026)</span>
       <span data-i18n="footer.privacy"></span>
-      <span>Presets por país: <a href="../../en/#guides">guías de IVA (EN)</a></span>
+      <span>Idiomas: <a href="../../lasku/" lang="fi">Suomi</a> · <a href="../../de/rechnung/" lang="de">Deutsch</a></span>
     </div>
   </footer>
 

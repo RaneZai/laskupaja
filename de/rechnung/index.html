@@ -2,8 +2,7 @@
 <!-- Laskupaja – Rechnungs-Generator (deutsch). Gleiche Engine wie /lasku/
      (js/invoice.js); standardmäßig deutsch (html[data-lp-lang]) und mit
      deutschen Umsatzsteuersätzen (html[data-lp-country], verifiziert
-     2026-09-03, Quellen auf /en/vat/de/). Akzeptiert ?country=CC&vat=XX
-     wie /en/invoice/. -->
+     2026-09-03). -->
 <html lang="de" data-lp-lang="de" data-lp-country="DE">
 <head>
   <meta charset="utf-8">
@@ -28,12 +27,7 @@
   <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
   <link rel="stylesheet" href="../../css/style.css">
 
-  <!--
-    Umsatzsteuersätze (verifiziert 2026-09-03, Quellen auf /en/vat/de/):
-    - Standard: Deutschland 19 % / 7 % / 0 %
-    - ?country=CC&vat=XX: Presets weiterer Länder (ES, FR, IT, NL, PL, SE, IE)
-      oder Finnland 2026 ohne country-Parameter.
-  -->
+  <!-- Umsatzsteuersätze Deutschland, verifiziert 2026-09-03: 19 % / 7 % / 0 %. -->
 
   <script src="../../js/reference.js" defer></script>
   <script src="../../js/numbering.js" defer></script>
@@ -61,7 +55,8 @@
       <nav class="main-nav" aria-label="Hauptmenü">
         <a class="nav-link" href="../" data-i18n="nav.home"></a>
         <a class="nav-link active" href="./" data-i18n="nav.invoice"></a>
-        <a class="nav-link" href="../../en/vat/de/">Deutschland-Guide</a>
+        <a class="nav-link" href="../../" lang="fi">Suomi</a>
+        <a class="nav-link" href="../../es/factura/" lang="es">Español</a>
       </nav>
       <div class="lang-toggle" role="group" aria-label="Sprache / Language">
         <button type="button" data-lang-toggle="de" aria-pressed="true">DE</button>
@@ -76,7 +71,7 @@
 
     <!-- Hinweis zur Rechnungsstellung in Deutschland (statischer Seiteninhalt) -->
     <section class="notice" lang="de" aria-label="Hinweis zur Rechnungsstellung in Deutschland">
-      <p><strong>Deutschland:</strong> <strong>Kleinunternehmer nach §19 UStG</strong> weisen keine Umsatzsteuer aus – im Generator dafür 0 % wählen und z. B. „Kein Ausweis von Umsatzsteuer gem. §19 UStG“ als Nachricht auf die Rechnung schreiben. Regelsätze 2026: <strong>19 %</strong> · reduziert <strong>7 %</strong>. Mehr im <a href="../../en/vat/de/">Deutschland-Guide</a> (auf Englisch).</p>
+      <p><strong>Deutschland:</strong> <strong>Kleinunternehmer nach §19 UStG</strong> weisen keine Umsatzsteuer aus – im Generator dafür 0 % wählen und z. B. „Kein Ausweis von Umsatzsteuer gem. §19 UStG“ als Nachricht auf die Rechnung schreiben. Regelsätze 2026: <strong>19 %</strong> · reduziert <strong>7 %</strong>.</p>
     </section>
 
     <!-- Datenspeicher-Transparenz (js/invoice.js) -->
@@ -270,7 +265,7 @@
       <span data-i18n="footer.disclaimer"></span>
       <span>Quellen: <a href="https://www.gesetze-im-internet.de/ustg_1980/__12.html" target="_blank" rel="noopener">§12 UStG (Sätze)</a>; <a href="https://www.bundesfinanzministerium.de/Content/DE/FAQ/e-rechnung.html" target="_blank" rel="noopener">BMF – E-Rechnung</a> (2026)</span>
       <span data-i18n="footer.privacy"></span>
-      <span>Länder-Presets: <a href="../../en/#guides">MwSt.-Guides (EN)</a></span>
+      <span>Sprachen: <a href="../../lasku/" lang="fi">Suomi</a> · <a href="../../es/factura/" lang="es">Español</a></span>
     </div>
   </footer>
 

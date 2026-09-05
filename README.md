@@ -4,7 +4,7 @@
 calculator for Finnish freelancers and small businesses. Everything runs in the
 browser: no signup, no server, no tracking, no external network calls.
 
-- Suomeksi (oletus), englanniksi, espanjaksi ja saksaksi · Finnish (default), English, Spanish and German
+- Suomenkielinen ydin sekä saksalainen ja espanjalainen laskupohja · Finnish core plus localized German and Spanish invoice generators
 - Correct **2026 VAT rates** from day one: general **25,5 %**, reduced
   **13,5 %** (from **1.1.2026**, previously 14 %), **10 %**, **0 %**
 - Pure client-side HTML/CSS/JS. No build step, no npm, no CDNs, no fonts
