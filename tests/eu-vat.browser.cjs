@@ -26,8 +26,9 @@ const data=require('../eu-vat-rates/rates.json');
   }
  }
  await page.selectOption('#country','FI');
- await page.selectOption('#rate-choice','13.5');
- await page.selectOption('#mode','remove');await page.fill('#amount','113,50');
+ const reduced=data.countries.find(c=>c.code==='FI').reduced.at(-1);
+ await page.selectOption('#rate-choice',String(reduced));
+ await page.selectOption('#mode','remove');await page.fill('#amount',String(100+reduced).replace('.',','));
  assert.equal(await page.locator('#net').textContent(),'100.00');
  await page.selectOption('#rate-choice','custom');await page.fill('#rate','4.5');
  assert.equal(await page.inputValue('#country'),'FI');
@@ -38,7 +39,7 @@ const data=require('../eu-vat-rates/rates.json');
  await page.fill('#search','Germany');assert.equal(await page.locator('tbody tr:visible').count(),1);
  await page.fill('#search','nothing matches');assert.equal(await page.locator('#empty').isVisible(),true);
  await page.fill('#search','');await page.selectOption('#sort','high');
- assert.equal(await page.locator('tbody tr').first().getAttribute('data-code'),'HU');
+ assert.equal(await page.locator('tbody tr').first().getAttribute('data-code'),data.countries.slice().sort((a,b)=>b.standard-a.standard||a.name.localeCompare(b.name))[0].code);
  await page.setViewportSize({width:390,height:844});
  await page.locator('#sources summary').click();
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
