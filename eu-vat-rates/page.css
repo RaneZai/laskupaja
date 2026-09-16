@@ -3,3 +3,5 @@
 #rate-help{margin:-6px 0 18px}.two:has(#custom-rate[hidden]){grid-template-columns:1fr}.meta a{color:var(--muted)}
 
 .intro .meta{margin:0 0 18px}
+
+.country-notes{padding-left:20px;overflow-wrap:anywhere}.country-notes li{margin:18px 0}.country-notes p{margin:5px 0}.sources details{margin-top:20px}

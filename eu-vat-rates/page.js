@@ -1,7 +1,7 @@
 'use strict';
 const $=id=>document.getElementById(id);
 const rows=[...document.querySelectorAll('tbody tr')];
-const rates=Object.fromEntries(rows.map(r=>[r.dataset.code,{standard:Number(r.dataset.rate),reduced:r.cells[2].textContent.replace('%','').split('/').map(Number)}]));
+const rates=Object.fromEntries(rows.map(r=>[r.dataset.code,{standard:Number(r.dataset.rate),reduced:r.cells[2].textContent.replace('%','').split('/').map(Number).filter(Number.isFinite)}]));
 const fmt=n=>n.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
 function number(value){const v=value.trim().replace(',','.');return /^\d+(\.\d+)?$/.test(v)?Number(v):NaN;}
 function calculate(){
@@ -18,7 +18,7 @@ function choose(code){
  $('country').value=code;
  const data=rates[code], select=$('rate-choice');
  select.replaceChildren(new Option(`Standard · ${data.standard}%`,String(data.standard)));
- [...new Set(data.reduced)].filter(rate=>rate!==data.standard).forEach(rate=>select.add(new Option(`${rate===0?'Zero rate':'Reduced'} · ${rate}%`,String(rate))));
+ [...new Set(data.reduced)].filter(rate=>rate!==data.standard).forEach(rate=>select.add(new Option(`${rate===0?'Zero rate':'Reduced / special'} · ${rate}%`,String(rate))));
  select.add(new Option('Custom rate…','custom'));
  $('rate').value=data.standard;$('custom-rate').hidden=true;calculate();
 }

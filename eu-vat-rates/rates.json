@@ -1,0 +1,372 @@
+{
+  "checked": "2026-09-17",
+  "content_updated": "2026-09-17",
+  "countries": [
+    {
+      "code": "AT",
+      "name": "Austria",
+      "standard": 20.0,
+      "reduced": [
+        4.9,
+        10,
+        13
+      ],
+      "sources": [
+        "https://europa.eu/youreurope/business/finance-and-tax/vat/vat-rules-rates/index_en.htm",
+        "https://www.usp.gv.at/aktuelles/gesetzliche-neuerungen/Bundesgesetzblatt/umsatzsteuergesetz.html"
+      ],
+      "note": "The 4.9% rate for selected food took effect on 1 July 2026. Other goods can still fall under 10% or 13%."
+    },
+    {
+      "code": "BE",
+      "name": "Belgium",
+      "standard": 21.0,
+      "reduced": [
+        6.0,
+        12.0
+      ],
+      "sources": [
+        "https://europa.eu/youreurope/business/finance-and-tax/vat/vat-rules-rates/index_en.htm"
+      ],
+      "note": ""
+    },
+    {
+      "code": "BG",
+      "name": "Bulgaria",
+      "standard": 20.0,
+      "reduced": [
+        9.0
+      ],
+      "sources": [
+        "https://europa.eu/youreurope/business/finance-and-tax/vat/vat-rules-rates/index_en.htm"
+      ],
+      "note": ""
+    },
+    {
+      "code": "HR",
+      "name": "Croatia",
+      "standard": 25.0,
+      "reduced": [
+        5.0,
+        13.0
+      ],
+      "sources": [
+        "https://europa.eu/youreurope/business/finance-and-tax/vat/vat-rules-rates/index_en.htm"
+      ],
+      "note": ""
+    },
+    {
+      "code": "CY",
+      "name": "Cyprus",
+      "standard": 19.0,
+      "reduced": [
+        3,
+        5,
+        9
+      ],
+      "sources": [
+        "https://europa.eu/youreurope/business/finance-and-tax/vat/vat-rules-rates/index_en.htm"
+      ],
+      "note": "Includes the 3% super-reduced rate."
+    },
+    {
+      "code": "CZ",
+      "name": "Czechia",
+      "standard": 21.0,
+      "reduced": [
+        12.0,
+        0.0
+      ],
+      "sources": [
+        "https://europa.eu/youreurope/business/finance-and-tax/vat/vat-rules-rates/index_en.htm"
+      ],
+      "note": ""
+    },
+    {
+      "code": "DK",
+      "name": "Denmark",
+      "standard": 25.0,
+      "reduced": [
+        0.0
+      ],
+      "sources": [
+        "https://europa.eu/youreurope/business/finance-and-tax/vat/vat-rules-rates/index_en.htm"
+      ],
+      "note": ""
+    },
+    {
+      "code": "EE",
+      "name": "Estonia",
+      "standard": 24.0,
+      "reduced": [
+        9,
+        13
+      ],
+      "sources": [
+        "https://europa.eu/youreurope/business/finance-and-tax/vat/vat-rules-rates/index_en.htm",
+        "https://www.emta.ee/en/business-client/taxes-and-payment/value-added-tax/vat-rates-and-supply-exempt-tax"
+      ],
+      "note": "The standard rate became 24% on 1 July 2025. The 13% rate covers qualifying accommodation; 9% applies to other specified supplies."
+    },
+    {
+      "code": "FI",
+      "name": "Finland",
+      "standard": 25.5,
+      "reduced": [
+        10.0,
+        13.5
+      ],
+      "sources": [
+        "https://europa.eu/youreurope/business/finance-and-tax/vat/vat-rules-rates/index_en.htm",
+        "https://www.vero.fi/en/businesses-and-corporations/taxes-and-charges/vat/rates-of-vat/"
+      ],
+      "note": "The 13.5% rate replaced 14% on 1 January 2026. The 10% rate still applies to newspapers and magazines."
+    },
+    {
+      "code": "FR",
+      "name": "France",
+      "standard": 20.0,
+      "reduced": [
+        2.1,
+        5.5,
+        10
+      ],
+      "sources": [
+        "https://europa.eu/youreurope/business/finance-and-tax/vat/vat-rules-rates/index_en.htm",
+        "https://www.impots.gouv.fr/international-professionnel/fiscalite-des-entreprises"
+      ],
+      "note": "The 2.1% special rate is included. This row covers mainland national rates; regional exceptions are excluded."
+    },
+    {
+      "code": "DE",
+      "name": "Germany",
+      "standard": 19.0,
+      "reduced": [
+        7.0
+      ],
+      "sources": [
+        "https://europa.eu/youreurope/business/finance-and-tax/vat/vat-rules-rates/index_en.htm"
+      ],
+      "note": ""
+    },
+    {
+      "code": "EL",
+      "name": "Greece",
+      "standard": 24.0,
+      "reduced": [
+        4,
+        6,
+        13
+      ],
+      "sources": [
+        "https://europa.eu/youreurope/business/finance-and-tax/vat/vat-rules-rates/index_en.htm",
+        "https://minfin.gov.gr/en/tax-policy/tax-guide/value-added-tax-vat/"
+      ],
+      "note": "The national rates include 4%, 6% and 13%. Qualifying island transactions use separate rates, including 17%, which are excluded from this national comparison."
+    },
+    {
+      "code": "HU",
+      "name": "Hungary",
+      "standard": 27.0,
+      "reduced": [
+        5.0,
+        18.0
+      ],
+      "sources": [
+        "https://europa.eu/youreurope/business/finance-and-tax/vat/vat-rules-rates/index_en.htm"
+      ],
+      "note": ""
+    },
+    {
+      "code": "IE",
+      "name": "Ireland",
+      "standard": 23.0,
+      "reduced": [
+        4.8,
+        9,
+        13.5
+      ],
+      "sources": [
+        "https://europa.eu/youreurope/business/finance-and-tax/vat/vat-rules-rates/index_en.htm",
+        "https://www.revenue.ie/en/vat/vat-rates/search-vat-rates/current-VAT-rates.aspx"
+      ],
+      "note": "The 4.8% rate applies to qualifying livestock. Farmer flat-rate compensation is a separate scheme and is not included."
+    },
+    {
+      "code": "IT",
+      "name": "Italy",
+      "standard": 22.0,
+      "reduced": [
+        4,
+        5,
+        10
+      ],
+      "sources": [
+        "https://europa.eu/youreurope/business/finance-and-tax/vat/vat-rules-rates/index_en.htm"
+      ],
+      "note": "Includes the 4% super-reduced rate."
+    },
+    {
+      "code": "LV",
+      "name": "Latvia",
+      "standard": 21.0,
+      "reduced": [
+        5.0,
+        12.0
+      ],
+      "sources": [
+        "https://europa.eu/youreurope/business/finance-and-tax/vat/vat-rules-rates/index_en.htm"
+      ],
+      "note": ""
+    },
+    {
+      "code": "LT",
+      "name": "Lithuania",
+      "standard": 21.0,
+      "reduced": [
+        5.0,
+        12.0
+      ],
+      "sources": [
+        "https://europa.eu/youreurope/business/finance-and-tax/vat/vat-rules-rates/index_en.htm",
+        "https://www.vmi.lt/evmi/pvm-tarifai"
+      ],
+      "note": "The 12% reduced rate took effect on 1 January 2026. Transitional rules can apply to earlier payments."
+    },
+    {
+      "code": "LU",
+      "name": "Luxembourg",
+      "standard": 17.0,
+      "reduced": [
+        3,
+        8,
+        14
+      ],
+      "sources": [
+        "https://europa.eu/youreurope/business/finance-and-tax/vat/vat-rules-rates/index_en.htm"
+      ],
+      "note": "Includes the 3% super-reduced and 14% intermediate rates."
+    },
+    {
+      "code": "MT",
+      "name": "Malta",
+      "standard": 18.0,
+      "reduced": [
+        5,
+        7,
+        12
+      ],
+      "sources": [
+        "https://europa.eu/youreurope/business/finance-and-tax/vat/vat-rules-rates/index_en.htm",
+        "https://mtca.gov.mt/business-tax/vat1/vat-compliance/vat-rates"
+      ],
+      "note": "The listed rates include the 12% reduced rate. Each rate is limited to specified supplies."
+    },
+    {
+      "code": "NL",
+      "name": "Netherlands",
+      "standard": 21.0,
+      "reduced": [
+        9.0
+      ],
+      "sources": [
+        "https://europa.eu/youreurope/business/finance-and-tax/vat/vat-rules-rates/index_en.htm",
+        "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/btw_berekenen_aan_uw_klanten/btw_berekenen/btw_tarief/"
+      ],
+      "note": ""
+    },
+    {
+      "code": "PL",
+      "name": "Poland",
+      "standard": 23.0,
+      "reduced": [
+        5.0,
+        8.0
+      ],
+      "sources": [
+        "https://europa.eu/youreurope/business/finance-and-tax/vat/vat-rules-rates/index_en.htm",
+        "https://www.podatki.gov.pl/podatki-firmowe/vat/stawki-i-limity"
+      ],
+      "note": ""
+    },
+    {
+      "code": "PT",
+      "name": "Portugal",
+      "standard": 23.0,
+      "reduced": [
+        6.0,
+        13.0
+      ],
+      "sources": [
+        "https://europa.eu/youreurope/business/finance-and-tax/vat/vat-rules-rates/index_en.htm"
+      ],
+      "note": ""
+    },
+    {
+      "code": "RO",
+      "name": "Romania",
+      "standard": 21.0,
+      "reduced": [
+        11.0
+      ],
+      "sources": [
+        "https://europa.eu/youreurope/business/finance-and-tax/vat/vat-rules-rates/index_en.htm"
+      ],
+      "note": ""
+    },
+    {
+      "code": "SK",
+      "name": "Slovakia",
+      "standard": 23.0,
+      "reduced": [
+        5.0,
+        19.0
+      ],
+      "sources": [
+        "https://europa.eu/youreurope/business/finance-and-tax/vat/vat-rules-rates/index_en.htm"
+      ],
+      "note": ""
+    },
+    {
+      "code": "SI",
+      "name": "Slovenia",
+      "standard": 22.0,
+      "reduced": [
+        5.0,
+        9.5
+      ],
+      "sources": [
+        "https://europa.eu/youreurope/business/finance-and-tax/vat/vat-rules-rates/index_en.htm"
+      ],
+      "note": ""
+    },
+    {
+      "code": "ES",
+      "name": "Spain",
+      "standard": 21.0,
+      "reduced": [
+        4,
+        10
+      ],
+      "sources": [
+        "https://europa.eu/youreurope/business/finance-and-tax/vat/vat-rules-rates/index_en.htm",
+        "https://sede.agenciatributaria.gob.es/Sede/iva/calculo-iva-repercutido-clientes/tipos-impositivos-iva.html"
+      ],
+      "note": "The 4% rate is included. Territorial exceptions, including the Canary Islands, require separate rules."
+    },
+    {
+      "code": "SE",
+      "name": "Sweden",
+      "standard": 25.0,
+      "reduced": [
+        6.0,
+        12.0
+      ],
+      "sources": [
+        "https://europa.eu/youreurope/business/finance-and-tax/vat/vat-rules-rates/index_en.htm",
+        "https://www.skatteverket.se/foretag/moms/saljavarorochtjanster/momssatspavarorochtjanster.4.58d555751259e4d66168000409.html"
+      ],
+      "note": ""
+    }
+  ]
+}

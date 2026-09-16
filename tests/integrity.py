@@ -8,6 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 PAGES = {
+    "eu-vat-rates/index.html": ["eu-vat-rates/page.js"],
     "index.html": ["js/i18n.js", "js/home.js"],
     "lasku/index.html": ["js/i18n.js", "js/numbering.js", "js/invoice.js"],
     "alv/index.html": ["js/i18n.js", "js/calculator.js"],
@@ -184,6 +185,7 @@ if errors:
 
 # ---------- 8. shipped-site assertions (sitemap, cross-links, reverse charge) ----------
 SITEMAP_REQUIRED = [
+    "https://laskupaja.com/eu-vat-rates/",
     "https://laskupaja.com/",
     "https://laskupaja.com/lasku/",
     "https://laskupaja.com/alv/",
@@ -241,4 +243,7 @@ for loc, ann in RC_ANNOTATIONS.items():
 print("OK  reverse-charge label + art.196 annotation strings in all 4 locales")
 
 
+if errors:
+    print("\n".join(errors))
+    sys.exit(1)
 print("ALL INTEGRITY CHECKS PASSED")
