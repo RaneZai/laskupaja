@@ -22,7 +22,7 @@
   if(backupError || (backup&&!password))pieces.push(T('attention'));
   backupStatus.textContent=pieces.join(' · ');
   root.querySelectorAll('[data-connection]').forEach(b=>b.hidden=!backup);
-  document.querySelectorAll('#private-library [data-save], #save-invoice-btn').forEach(b=>b.disabled=!ready||!enabled||blocked);
+  document.querySelectorAll('#private-library [data-save], #invoice-form [data-save], #save-invoice-btn').forEach(b=>b.disabled=!ready||!enabled||blocked);
  }
  function renderList(){
   if(!list||!store.state)return;list.replaceChildren();
@@ -165,7 +165,15 @@
   const originalInfo=$('#storage-box [data-i18n="inv.storageInfo"]');if(originalInfo)originalInfo.hidden=true;
   const backups=node('div',null,{class:'library-actions'});const setup=button('setup',()=>passwordDialog('setup'));setup.dataset.save='';const down=button('download',()=>passwordDialog('download'));down.dataset.save='';const restore=button('restore',()=>passwordDialog('restore'));restore.dataset.save='';const reconnectButton=button('reconnect',reconnect),stopButton=button('disconnect',async()=>{clearTimeout(timer);password=null;backup=null;archive=null;backupError=false;await store.setting('backup',null);renderStatus();});reconnectButton.dataset.connection='';stopButton.dataset.connection='';backups.append(setup,down,restore,reconnectButton,stopButton);root.append(backups,node('p',T('backupHelp'),{class:'hint'}));if(!window.showSaveFilePicker)root.append(node('p',T('manual'),{class:'hint'}));
   promptBox=node('aside',null,{class:'library-prompt'});promptBox.hidden=true;promptBox.append(node('p',T('first')),button('setup',()=>passwordDialog('setup')),button('later',()=>promptBox.hidden=true));storage.append(promptBox);
-  const tools=node('div',null,{class:'library-actions'});for(const [key,fn] of [['saveCustomer',()=>editRecord('customers',null,{...adapter.collect().client,terms:adapter.collect().meta.terms,email:adapter.collect().client.email||''})],['newProduct',()=>editRecord('products')],['saveProfile',()=>editRecord('profiles',null,adapter.profile())]]){const b=button(key,fn);b.dataset.save='';tools.append(b);}root.append(tools);
+  const tools=node('div',null,{class:'library-actions'});for(const [key,fn] of [['saveCustomer',()=>editRecord('customers',null,{...adapter.collect().client,terms:adapter.collect().meta.terms,email:adapter.collect().client.email||''})],['newProduct',()=>editRecord('products')],['saveProfile',()=>editRecord('profiles',null,adapter.profile())]]){const b=button(key,fn);b.dataset.save='';tools.append(b);
+   const field=key==='saveProfile'?'senderName':key==='saveCustomer'?'clientName':null;
+   if(field){
+    const id=key==='saveProfile'?'save-profile-inline':'save-customer-inline';
+    $('#'+id)?.remove();
+    const inline=button(key,fn);inline.id=id;inline.dataset.save='';
+    $('#'+field).closest('section').append(inline);
+   }
+  }root.append(tools);
   const controls=node('div',null,{class:'library-filters'}),typeLabel=node('label',T('title')),type=node('select');C.GROUPS.forEach(k=>type.append(node('option',T(k),{value:k})));type.value=kind;type.onchange=()=>{kind=type.value;renderList();};typeLabel.append(type);const searchLabel=node('label',T('search')),search=node('input',null,{type:'search'});search.value=filter;search.oninput=()=>{filter=search.value;renderList();};searchLabel.append(search);controls.append(typeLabel,searchLabel);root.append(controls,node('p',T('market'),{class:'hint'}));list=node('div',null,{class:'library-list'});root.append(list);
   $('#save-invoice-btn')?.remove();$('#library-save-status')?.remove();
   const saveFeedback=node('span','',{id:'library-save-status',role:'status'});
