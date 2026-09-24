@@ -955,7 +955,7 @@
       `<dt>${esc(t('print.amount'))}</dt><dd>${esc(fmtMoney(totals.grossC))}</dd>` +
       `<dt>${esc(t('print.payableBy'))}</dt><dd>${esc(fmtDate(d.meta.due))}</dd>` +
       `</dl></div>` +
-      `<div class="pv-footer"><span>${esc(t('print.thanks'))} ${esc(t('print.disclaimer'))}</span>` +
+      `<div class="pv-footer">` +
       `<span>${esc(t('print.madeWith'))}</span></div>`;
   }
 
