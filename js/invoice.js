@@ -4,9 +4,9 @@
  *  - totals with VAT breakdown by rate
  *  - national + RF payment references (js/reference.js)
  *  - invoice numbering: prefix/padding-preserving increment (js/numbering.js)
- *  - persistent business profile ("Omat tiedot"), stored in localStorage
+ *  - persistent business profile ("Omat tiedot"), stored in IndexedDB
  *    SEPARATELY from the per-invoice draft
- *  - draft autosave to localStorage, only while "remember my details" is on
+ *  - draft autosave to IndexedDB, only while "remember my details" is on
  *  - storage opt-out: wipes every data key and stops persisting entirely
  *  - A4 print view built before every print
  *
@@ -40,6 +40,7 @@
       'inv.defaultVat': 'Oletus ALV-% uusille riveille',
       'inv.client': 'Asiakas',
       'inv.clientName': 'Nimi tai yritys *',
+      'inv.clientEmail': 'Sähköposti / yhteystiedot',
       'inv.clientBid': 'Y-tunnus (valinnainen)',
       'inv.details': 'Laskun tiedot',
       'inv.number': 'Laskunumero',
@@ -90,7 +91,7 @@
       'inv.autosave': 'Luonnos tallentuu automaattisesti selaimeen.',
       'inv.savedAt': 'Tallennettu',
       'inv.storageTitle': 'Tietojen tallennus',
-      'inv.storageInfo': 'Tiedot tallennetaan vain selaimeesi (localStorage) — niitä ei lähetetä mihinkään palvelimelle.',
+      'inv.storageInfo': 'Tiedot tallennetaan vain tähän selaimeen. Varmuuskopiot tallennetaan valitsemaasi tiedostoon.',
       'inv.remember': 'Muista tietoni tällä laitteella',
       'inv.clearSaved': 'Tyhjennä tallennetut tiedot',
       'inv.confirmClear': 'Tyhjennetäänkö kaikki tallennetut tiedot (luonnos ja omat tiedot)? Tätä ei voi kumota.',
@@ -138,6 +139,7 @@
       'inv.defaultVat': 'Default VAT % for new rows',
       'inv.client': 'Client',
       'inv.clientName': 'Name or company *',
+      'inv.clientEmail': 'Email / contact details',
       'inv.clientBid': 'Business ID / VAT number (optional)',
       'inv.details': 'Invoice details',
       'inv.number': 'Invoice number',
@@ -188,7 +190,7 @@
       'inv.autosave': 'The draft autosaves to your browser.',
       'inv.savedAt': 'Saved',
       'inv.storageTitle': 'Data storage',
-      'inv.storageInfo': 'Your details are stored only in your browser — nothing is ever sent to any server.',
+      'inv.storageInfo': 'Your records stay in this browser. Backups are saved to a file you choose.',
       'inv.remember': 'Remember my details on this device',
       'inv.clearSaved': 'Clear saved data',
       'inv.confirmClear': 'Clear all saved data (draft and your details)? This cannot be undone.',
@@ -236,6 +238,7 @@
       'inv.defaultVat': 'IVA % por defecto para nuevas líneas',
       'inv.client': 'Cliente',
       'inv.clientName': 'Nombre o empresa *',
+      'inv.clientEmail': 'Correo / contacto',
       'inv.clientBid': 'NIF/CIF o n.º IVA intracomunitario (opcional)',
       'inv.details': 'Datos de la factura',
       'inv.number': 'Nº de factura',
@@ -286,7 +289,7 @@
       'inv.autosave': 'El borrador se guarda automáticamente en tu navegador.',
       'inv.savedAt': 'Guardado',
       'inv.storageTitle': 'Almacenamiento de datos',
-      'inv.storageInfo': 'Tus datos se guardan solo en tu navegador — nunca se envían a ningún servidor.',
+      'inv.storageInfo': 'Tus registros permanecen en este navegador. Las copias se guardan en el archivo que elijas.',
       'inv.remember': 'Recordar mis datos en este dispositivo',
       'inv.clearSaved': 'Borrar datos guardados',
       'inv.confirmClear': '¿Borrar todos los datos guardados (borrador y tus datos)? No se puede deshacer.',
@@ -334,6 +337,7 @@
       'inv.defaultVat': 'Standard-MwSt. % für neue Positionen',
       'inv.client': 'Kunde',
       'inv.clientName': 'Name oder Firma *',
+      'inv.clientEmail': 'E-Mail / Kontaktdaten',
       'inv.clientBid': 'Steuernummer / USt-IdNr. (optional)',
       'inv.details': 'Rechnungsdaten',
       'inv.number': 'Rechnungsnummer',
@@ -384,7 +388,7 @@
       'inv.autosave': 'Der Entwurf speichert sich automatisch im Browser.',
       'inv.savedAt': 'Gespeichert',
       'inv.storageTitle': 'Datenspeicherung',
-      'inv.storageInfo': 'Deine Daten werden nur in deinem Browser gespeichert — sie werden nie an einen Server gesendet.',
+      'inv.storageInfo': 'Deine Daten bleiben in diesem Browser. Sicherungen werden in einer Datei deiner Wahl gespeichert.',
       'inv.remember': 'Meine Daten auf diesem Gerät merken',
       'inv.clearSaved': 'Gespeicherte Daten löschen',
       'inv.confirmClear': 'Alle gespeicherten Daten löschen (Entwurf und meine Daten)? Das kann nicht rückgängig gemacht werden.',
@@ -435,10 +439,13 @@
   const CTX = window.LP_VAT_CONTEXT || null;
 
   function vatOptions() {
-    if (!CTX) return VAT_OPTIONS;
+    if (!CTX) return VAT_OPTIONS.slice();
     return CTX.rates.map((v) => ({ value: String(v), label: v + '%', key: null }));
   }
 
+  const Library = window.LPLibrary;
+  let working = null;
+  let persistenceEpoch = 0;
   const LS_DRAFT = 'laskupaja:draft';
   const LS_LAST_NO = 'laskupaja:lastInvoiceNo';
   const LS_PROFILE = 'laskupaja:profile';   /* business profile, separate from the draft */
@@ -508,6 +515,9 @@
   }
 
   function lsGet(key) {
+    if (LS_DATA_KEYS.includes(key) && working) {
+      return key === LS_DRAFT ? JSON.stringify(working.draft) : key === LS_PROFILE ? JSON.stringify(working.profile) : working.lastNo;
+    }
     try { return localStorage.getItem(key); } catch (e) { return null; }
   }
   function lsSet(key, value) {
@@ -536,11 +546,6 @@
     return lsGet(LS_REMEMBER) !== '0';
   }
 
-  /* Wipe every data key the app writes (draft, last number, profile). */
-  function wipeStoredData() {
-    LS_DATA_KEYS.forEach(lsDel);
-  }
-
   /* Status line inside the storage box (aria-live). */
   function setStorageStatus(msg) {
     const el = $('#storage-status');
@@ -560,7 +565,9 @@
   /* ---------- line rows ---------- */
 
   function vatSelectHTML(selected) {
-    return vatOptions()
+    const options=vatOptions();
+    if (selected != null && !options.some(o=>o.value===String(selected)) && Number.isFinite(Number(selected)) && Number(selected)>=0 && Number(selected)<=100) options.push({value:String(selected),label:String(selected)+'%',key:null});
+    return options
       .map((o) => {
         const sel = o.value === selected ? ' selected' : '';
         return o.key
@@ -741,9 +748,8 @@
 
   /* ---------- business profile ("Omat tiedot") ---------- */
 
-  /* The sender card on the page doubles as the profile editor: name,
-   * Y-tunnus, address, IBAN + default payment terms and default VAT %.
-   * Stored under its own localStorage key, separately from the draft. */
+  /* Sender fields are part of the working copy. Named business profiles
+   * in the library can be reused without changing saved invoice snapshots. */
   function collectProfile() {
     const terms = parseInt($('#profileTerms').value, 10);
     return {
@@ -765,19 +771,10 @@
     set('#senderAddress', p.address);
     set('#senderIban', p.iban);
     set('#profileTerms', p.defaultTerms);
+    if (p.defaultVat != null && Number.isFinite(Number(p.defaultVat)) && !Array.from($('#profileVat').options).some(o=>o.value===String(p.defaultVat))) {
+      const option=document.createElement('option');option.value=String(p.defaultVat);option.textContent=String(p.defaultVat)+'%';$('#profileVat').append(option);
+    }
     set('#profileVat', p.defaultVat);
-  }
-
-  function loadProfile() {
-    const raw = lsGet(LS_PROFILE);
-    if (!raw) return null;
-    try { return JSON.parse(raw); } catch (e) { lsDel(LS_PROFILE); return null; }
-  }
-
-  /* Profile persistence is gated by the remember opt-out. */
-  function saveProfile() {
-    if (!rememberOn()) return;
-    lsSet(LS_PROFILE, JSON.stringify(collectProfile()));
   }
 
   /* ---------- draft: collect / apply / autosave ---------- */
@@ -795,6 +792,7 @@
         name: $('#clientName').value,
         bid: $('#clientBid').value,
         address: $('#clientAddress').value,
+        email: $('#clientEmail').value,
       },
       meta: {
         number: $('#invoiceNumber').value,
@@ -819,6 +817,7 @@
     set('#clientName', d.client && d.client.name);
     set('#clientBid', d.client && d.client.bid);
     set('#clientAddress', d.client && d.client.address);
+    set('#clientEmail', d.client?.email || '');
     set('#invoiceNumber', d.meta && d.meta.number);
     set('#invoiceDate', d.meta && d.meta.date);
     set('#paymentTerms', d.meta && d.meta.terms);
@@ -831,29 +830,28 @@
     items.forEach((it) => addRow(it));
   }
 
-  let saveTimer = null;
+  let saveTimer = null, saveCounter = 0, pendingDraft = false;
   function scheduleSave() {
+    pendingDraft = true;
     clearTimeout(saveTimer);
     saveTimer = setTimeout(saveDraft, 350);
   }
 
-  function saveDraft() {
-    if (!rememberOn()) {
-      /* opted out: nothing is ever persisted; keep the UI honest */
-      $('#autosave-note').textContent = t('inv.storageOff');
-      return;
-    }
+  async function saveDraft() {
+    clearTimeout(saveTimer);saveTimer=null;
+    const request=++saveCounter;
+    if (!rememberOn()) { pendingDraft=false;$('#autosave-note').textContent = t('inv.storageOff'); return; }
+    pendingDraft=true;
+    const epoch = persistenceEpoch;
     const data = collectForm();
-    lsSet(LS_DRAFT, JSON.stringify(data));
-    saveProfile(); /* the sender card fields double as the persistent profile */
-    if (data.meta.number && data.meta.number.trim()) {
-      lsSet(LS_LAST_NO, data.meta.number.trim());
-    }
-    const note = $('#autosave-note');
-    const time = new Date().toLocaleTimeString(LOCALES[LP.i18n.getLang()] || 'en-GB', {
-      hour: '2-digit', minute: '2-digit',
-    });
-    note.textContent = t('inv.savedAt') + ' ' + time;
+    const next = {draft:data,profile:collectProfile(),lastNo:data.meta.number.trim() || working?.lastNo || ''};
+    try {
+      await Library.saveWorking(next);
+      if (epoch !== persistenceEpoch) return;
+      working = next;
+      if(request===saveCounter && !saveTimer)pendingDraft=false;
+      $('#autosave-note').textContent = Library.T('saved') + ' ' + new Date().toLocaleTimeString(LOCALES[LP.i18n.getLang()], {hour:'2-digit',minute:'2-digit'});
+    } catch(e) { if (epoch === persistenceEpoch) { $('#autosave-note').textContent = Library.T('error'); Library.showError(e); } }
   }
 
   /* Invoice numbering lives in js/numbering.js (LP.numbering),
@@ -919,7 +917,7 @@
       `<div class="pv-parties">` +
       `<div class="pv-party"><h3>${esc(t('print.client'))}</h3><p>${esc(d.client.name || '—')}` +
       `${d.client.bid ? '\n' + esc(t('print.bid')) + ': ' + esc(d.client.bid) : ''}` +
-      `${d.client.address ? '\n' + esc(d.client.address) : ''}</p></div>` +
+      `${d.client.address ? '\n' + esc(d.client.address) : ''}${d.client.email ? '\n' + esc(d.client.email) : ''}</p></div>` +
       `<div class="pv-party"><h3>${esc(t('print.terms'))}</h3>` +
       `<p>${esc(d.meta.terms || '0')} ${esc(t('print.days'))}</p></div>` +
       `</div>` +
@@ -973,22 +971,63 @@
 
   /* ---------- init & events ---------- */
 
-  function init() {
+  async function init() {
+    $('#invoice-form').inert = true;
+    $('#rememberMe').disabled = true;
+    $('#clear-saved-btn').disabled = true;
     if (CTX) applyVatContext(); /* country options before profile/draft load */
+    function renderAll() { applyReverseCharge(false); renderTotals(); renderRefs(); buildPrintView(); }
+    function reloadWorking(w) {
+      clearTimeout(saveTimer);saveTimer=null;pendingDraft=false; persistenceEpoch++;
+      working = w || null;
+      $('#invoice-form').reset();
+      $('#items-body').replaceChildren();
+      if (w) { applyProfile(w.profile); applyDraft(w.draft); }
+      if (!$('#items-body .item-row')) addRow();
+      if (!$('#invoiceDate').value) $('#invoiceDate').value = todayISO();
+      if (!$('#invoiceNumber').value) $('#invoiceNumber').value = Numbering.nextInvoiceNumber(null);
+      if (!$('#paymentTerms').value) $('#paymentTerms').value = defaultTerms();
+      if (!$('#dueDate').value) syncDueFromTerms();
+      renderAll();
+    }
+    working = await Library.init({
+      remember:rememberOn, collect:collectForm, profile:collectProfile,
+      defaultVat, rates:()=>vatOptions().map(o=>o.value),
+      removeLegacy:()=>LS_DATA_KEYS.forEach(k=>{ try { localStorage.removeItem(k); } catch(e) {} }),
+      legacy:()=>{
+        const raw = localStorage.getItem(LS_DRAFT), profileRaw = localStorage.getItem(LS_PROFILE), lastNo = localStorage.getItem(LS_LAST_NO);
+        if (!raw && !profileRaw && !lastNo) return null;
+        const profile = profileRaw ? JSON.parse(profileRaw) : collectProfile();
+        const draft = raw ? JSON.parse(raw) : collectForm();
+        if (!raw) { draft.sender={name:profile.name||'',bid:profile.bid||'',address:profile.address||'',iban:profile.iban||''}; draft.meta.number=Numbering.nextInvoiceNumber(lastNo);draft.meta.terms=String(profile.defaultTerms??DEFAULT_TERMS); }
+        return {draft,profile,lastNo:lastNo||draft.meta.number||''};
+      },
+      reloadWorking,
+      applyInvoice:(d,duplicate)=>{
+        clearTimeout(saveTimer);
+        if(duplicate){ d.meta.number=Library.nextNumber(working?.lastNo || d.meta.number);d.meta.date=todayISO();d.meta.due=addDaysISO(d.meta.date,parseNum(d.meta.terms)); }
+        applyDraft(d);renderAll();saveDraft();
+      },
+      use:(type,data)=>{
+        if(type==='customers') { $('#clientName').value=data.name;$('#clientBid').value=data.bid;$('#clientAddress').value=data.address;$('#clientEmail').value=data.email||'';$('#paymentTerms').value=data.terms;syncDueFromTerms(); }
+        if(type==='profiles') { applyProfile(data);$('#paymentTerms').value=data.defaultTerms;syncDueFromTerms(); }
+        if(type==='products') {
+          if(data.pricesIncl!==$('#pricesInclVat').checked)throw Error('mismatch');
+          const rows=$$('#items-body .item-row');if(rows.length===1&&!rowValues(rows[0]).desc&&!rowValues(rows[0]).price)rows[0].remove();
+          addRow({...data,qty:1});
+        }
+        renderAll();saveDraft();
+      }
+    });
     /* default or restored state */
     const remember = rememberOn();
     refreshStorageUI(); /* checkbox reflects the stored opt-out */
-    if (remember) {
-      const profile = loadProfile();
+    if (remember && working) {
+      const profile = working.profile;
       if (profile) applyProfile(profile);
-      const draftRaw = lsGet(LS_DRAFT);
+      const draftRaw = JSON.stringify(working.draft);
       if (draftRaw) {
-        let draftApplied = false;
-        try { applyDraft(JSON.parse(draftRaw)); draftApplied = true; } catch (e) { lsDel(LS_DRAFT); }
-        if (draftApplied && !profile) {
-          /* migrate: v1 drafts predate the separate profile store */
-          saveProfile();
-        }
+        applyDraft(JSON.parse(draftRaw));
       } else if (profile) {
         /* fresh invoice with saved defaults: terms follow the profile */
         $('#paymentTerms').value = defaultTerms();
@@ -1000,7 +1039,7 @@
     if (!$('#paymentTerms').value) $('#paymentTerms').value = defaultTerms();
     if (!$('#dueDate').value) syncDueFromTerms();
     if (!$('#invoiceNumber').value) {
-      $('#invoiceNumber').value = Numbering.nextInvoiceNumber(lsGet(LS_LAST_NO));
+      $('#invoiceNumber').value = Library.nextNumber(working?.lastNo || null);
     }
     if (!remember) $('#autosave-note').textContent = t('inv.storageOff');
 
@@ -1077,8 +1116,7 @@
       /* When remembering is off there is no stored last number, so the
        * on-screen number is the increment base. */
       const lastNo = (rememberOn() && lsGet(LS_LAST_NO)) || $('#invoiceNumber').value.trim();
-      const next = Numbering.nextInvoiceNumber(lastNo || null);
-      lsDel(LS_DRAFT);
+      const next = Library.nextNumber(lastNo || null);
       $('#invoice-form').reset();
       applyReverseCharge(false); /* reset unchecked RC: re-enable the VAT selects */
       applyProfile(profile);
@@ -1097,30 +1135,27 @@
     });
 
     /* storage opt-out & clear (storage box above the form) */
-    $('#rememberMe').addEventListener('change', () => {
-      if ($('#rememberMe').checked) {
-        lsSet(LS_REMEMBER, '1');
-        setStorageStatus('');
-        saveDraft(); /* immediately persist the current profile + draft again */
-      } else {
-        if (!window.confirm(t('inv.confirmRememberOff'))) {
-          $('#rememberMe').checked = true; /* cancelled: revert the toggle */
-          return;
-        }
-        wipeStoredData();
-        lsSet(LS_REMEMBER, '0'); /* the opt-out itself is a setting: persist it */
+    $('#rememberMe').addEventListener('change', async () => {
+      const on=$('#rememberMe').checked;
+      if (!on && !window.confirm(t('inv.confirmRememberOff') + '\n' + Library.T('clearHelp'))) { $('#rememberMe').checked=true;return; }
+      clearTimeout(saveTimer);saveTimer=null;pendingDraft=false; persistenceEpoch++;
+      $('#rememberMe').disabled=true;
+      try {
+        if (!on) { lsSet(LS_REMEMBER,'0'); await Library.clear(false);working=null; }
+        else { lsSet(LS_REMEMBER,'1');Library.enable(true);await saveDraft(); }
         refreshStorageUI();
-        $('#autosave-note').textContent = t('inv.storageOff');
-      }
+      } catch(e) { Library.showError(e); }
+      finally { $('#rememberMe').disabled=false; }
     });
-
-    $('#clear-saved-btn').addEventListener('click', () => {
-      if (!window.confirm(t('inv.confirmClear'))) return;
-      wipeStoredData();
-      setStorageStatus(t('inv.cleared'));
-      $('#autosave-note').textContent = t('inv.cleared');
-      /* While remembering stays on, the next edit autosaves a fresh draft. */
+    $('#clear-saved-btn').addEventListener('click', async () => {
+      if (!window.confirm(t('inv.confirmClear') + '\n' + Library.T('clearHelp'))) return;
+      clearTimeout(saveTimer);saveTimer=null;pendingDraft=false;persistenceEpoch++;
+      try { await Library.clear(rememberOn());reloadWorking(null);setStorageStatus(t('inv.cleared'));$('#autosave-note').textContent=t('inv.cleared'); }
+      catch(e){ Library.showError(e); }
     });
+    $('#invoice-form').inert=false;
+    $('#rememberMe').disabled=false;
+    $('#clear-saved-btn').disabled=false;
 
     /* print */
     $('#print-btn').addEventListener('click', () => {
@@ -1128,6 +1163,7 @@
       window.print();
     });
     window.addEventListener('beforeprint', buildPrintView);
+    window.addEventListener('beforeunload', e=>{if(pendingDraft && rememberOn()){e.preventDefault();e.returnValue='';}});
 
     /* language switch: refresh everything rendered from JS */
     document.addEventListener('lp:langchange', () => {
@@ -1139,5 +1175,5 @@
     });
   }
 
-  document.addEventListener('DOMContentLoaded', init);
+  document.addEventListener('DOMContentLoaded', () => init().catch(e=>{ Library.showError(e);$('#invoice-form').inert=false; }));
 })();

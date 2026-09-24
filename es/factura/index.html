@@ -4,6 +4,7 @@
      tipos de IVA de España (html[data-lp-country], verificado 2026-09-03). -->
 <html lang="es" data-lp-lang="es" data-lp-country="ES">
 <head>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; connect-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -32,8 +33,11 @@
   <script src="../../js/numbering.js" defer></script>
   <script src="../../js/vat-context.js" defer></script>
   <script src="../../js/i18n.js" defer></script>
+  <script src="../../js/library-store.js" defer></script>
+  <script src="../../js/library-i18n.js" defer></script>
+  <script src="../../js/library.js" defer></script>
   <script src="../../js/invoice.js" defer></script>
-  <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "d3a80783da61452e90a2a0feccff2794"}'></script>
+  <link rel="stylesheet" href="../../css/library.css">
 </head>
 <body>
 
@@ -145,6 +149,10 @@
         <div class="field">
           <label for="clientAddress" data-i18n="inv.address"></label>
           <textarea id="clientAddress" rows="2"></textarea>
+        </div>
+        <div class="field">
+          <label for="clientEmail" data-i18n="inv.clientEmail"></label>
+          <input type="text" id="clientEmail" maxlength="200">
         </div>
       </section>
 

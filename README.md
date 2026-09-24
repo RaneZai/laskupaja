@@ -2,7 +2,7 @@
 
 **Ilmainen laskutusverstaas** – a free, zero-backend invoice generator and ALV
 calculator for Finnish freelancers and small businesses. Everything runs in the
-browser: no signup, no server, no tracking, no external network calls.
+browser without an account or application backend. Invoice editors keep records local; public pages use Cloudflare Web Analytics.
 
 - Suomenkielinen ydin sekä saksalainen ja espanjalainen laskupohja · Finnish core plus localized German and Spanish invoice generators
 - Correct **2026 VAT rates** from day one: general **25,5 %**, reduced
@@ -24,6 +24,11 @@ browser: no signup, no server, no tracking, no external network calls.
 
 ## Features
 
+- **Local library:** reusable customers, products/services and business profiles;
+  searchable saved invoices with independent snapshots and duplication.
+  Encrypted device backups, version retention and restore are included.
+  See [local library behavior and tests](docs/LOCAL-LIBRARY.md).
+
 - **Invoice generator** (`/lasku/`): sender & client blocks (name, Y-tunnus,
   address, IBAN), invoice number, invoice date, payment terms in days with
   auto-computed due date, line items (description, qty, unit, unit price,
@@ -44,9 +49,8 @@ browser: no signup, no server, no tracking, no external network calls.
 - **FI/EN language toggle** persisted in `localStorage`; every UI string (and
   the printed invoice) exists in both languages.
 - **Business profile ("Omat tiedot")**: sender name, Y-tunnus, address, IBAN
-  plus default payment terms and default VAT % are stored under their own
-  `localStorage` key, separately from the per-invoice draft, and prefilled on
-  every load. "New invoice" keeps the profile, clears client/rows/message,
+  plus default payment terms and default VAT % are stored in IndexedDB with
+  the working draft. Named profiles can be saved and selected from the library. "New invoice" keeps the profile, clears client/rows/message,
   auto-increments the number and resets dates (today / today + default terms).
 - **Invoice numbering**: trailing digits are incremented with prefix and zero
   padding preserved ("2026-004" → "2026-005", "INV007" → "INV008"); values
@@ -56,13 +60,14 @@ browser: no signup, no server, no tracking, no external network calls.
   (FI/EN) explaining that data is stored only in the browser. "Remember my
   details on this device" (default on) toggles all persistence; turning it
   off – or "Clear saved data" – wipes every data key the app writes
-  (draft, last invoice number, profile). The language preference is a
+  (library, working drafts and backup connection). Existing backup files stay
+  on the device. The language preference is a
   non-personal UI setting and may persist.
 - **Print to PDF** (Ctrl+P / button): professional A4 print stylesheet –
   invoice header, item table, right-aligned totals, payment block
   (IBAN + viite + RF + amount + due date), footer disclaimer
   *“Ei oikeudellista neuvontaa / Not legal advice”*.
-- **Draft autosave** to `localStorage`; remembers the last invoice number and
+- **Draft autosave** to IndexedDB; remembers the last invoice number and
   suggests the next one; “New invoice” asks for confirmation first.
 - **ALV calculator** (`/alv/`): amount + direction (net→gross / gross→net) +
   rate selector (25,5 / 13,5 / 10 / 0 / custom %), live results, plus an info
