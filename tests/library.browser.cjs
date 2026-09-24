@@ -31,11 +31,26 @@ const server=http.createServer((req,res)=>{const p=path.join(root,decodeURICompo
   await p2.locator('.library-filters select').selectOption('products');await p2.getByRole('button',{name:'Use in invoice',exact:true}).click();await settle(p2);assert.equal(await p2.locator('.ri-desc').last().inputValue(),'Saved service: Consultation');ok('catalog product inserts into invoice');
   await p2.locator('#pricesInclVat').check();await settle(p2);await p2.getByRole('button',{name:'Use in invoice',exact:true}).click();await p2.getByRole('alert').filter({hasText:'different VAT-inclusive'}).waitFor();ok('mixed VAT price modes are not silently reinterpreted');
   const other=await c2.newPage();await load(other);await p2.locator('#clientName').fill('Tab one');await settle(p2);await other.getByRole('alert').filter({hasText:'another tab'}).waitFor();await other.locator('#clientName').fill('Stale tab');await settle(other);await p2.reload();await p2.waitForFunction(()=>LPLibrary.ready);assert.equal(await p2.locator('#clientName').inputValue(),'Tab one');ok('stale tab cannot overwrite newer records');await other.close();
-  await p2.locator('#rememberMe').uncheck();await p2.waitForFunction(()=>!document.querySelector('#rememberMe').disabled);await p2.reload();await p2.waitForFunction(()=>LPLibrary.ready);assert.equal(await p2.locator('.library-record').count(),0);assert.equal(await p2.locator('#clientName').inputValue(),'');assert.equal(await p2.locator('#rememberMe').isChecked(),false);ok('opt-out deletes all records and persists across reload');
-  await p2.locator('#rememberMe').check();await settle(p2);await p2.locator('#clientName').fill('Resumed');await settle(p2);await p2.reload();await p2.waitForFunction(()=>LPLibrary.ready);assert.equal(await p2.locator('#clientName').inputValue(),'Resumed');ok('remembering can be enabled again');
+  await p2.locator('#save-invoice-btn').click();await settle(p2);
+  assert(await p2.locator('#library-save-status').innerText());
+  await p2.locator('#rememberMe').uncheck();await p2.waitForFunction(()=>!document.querySelector('#rememberMe').disabled);assert.equal(await p2.locator('#library-save-status').innerText(),'');
+  assert.equal(await p2.locator('.library-prompt').isVisible(),false);
+  async function checkOffCopy(page){
+   assert.equal(await page.locator('[data-i18n="inv.leadOff"]').count(),1);
+   assert.equal(await page.locator('[data-i18n="inv.myDetailsHintOff"]').count(),1);
+   assert.equal(await page.locator('#autosave-note').getAttribute('data-i18n'),'inv.storageOff');
+   assert.equal(await page.locator('#autosave-note').innerText(),await page.locator('#storage-status').innerText());
+  }
+  await checkOffCopy(p2);
+  await p2.locator('[data-lang-toggle="fi"]').click();await checkOffCopy(p2);
+  assert.match(await p2.locator('.lead').innerText(),/Tietoja ei tallenneta/);
+  await p2.locator('[data-lang-toggle="en"]').click();await checkOffCopy(p2);
+  assert.match(await p2.locator('.lead').innerText(),/Nothing is saved/);
+  await p2.reload();await p2.waitForFunction(()=>LPLibrary.ready);await checkOffCopy(p2);ok('off copy follows toggle, language and reload; earlier saved feedback is cleared');assert.equal(await p2.locator('.library-record').count(),0);assert.equal(await p2.locator('#clientName').inputValue(),'');assert.equal(await p2.locator('#rememberMe').isChecked(),false);ok('opt-out deletes all records and persists across reload');
+  await p2.locator('#rememberMe').check();await settle(p2);await p2.locator('#clientName').fill('Resumed');await settle(p2);await p2.reload();await p2.waitForFunction(()=>LPLibrary.ready);assert.equal(await p2.locator('#clientName').inputValue(),'Resumed');assert.equal(await p2.locator('[data-i18n="inv.lead"]').count(),1);assert.equal(await p2.locator('[data-i18n="inv.myDetailsHint"]').count(),1);ok('remembering can be enabled again with saving copy restored');
   await c2.close();
   const migration=await context();await migration.addInitScript(()=>{localStorage.setItem('laskupaja:draft',JSON.stringify({v:1,sender:{name:'Legacy',bid:'',address:'',iban:''},client:{name:'Old customer',bid:'',address:''},meta:{number:'OLD-007',date:'2026-09-20',due:'2026-10-04',terms:'14'},notes:'',pricesIncl:false,reverseCharge:false,items:[{desc:'Old work',qty:1,unit:'h',price:10,vat:'25.5'}]}));});const pm=await migration.newPage();await load(pm);assert.equal(await pm.locator('#clientName').inputValue(),'Old customer');assert.equal(await pm.evaluate(()=>localStorage.getItem('laskupaja:draft')),null);ok('legacy draft migration commits before removing localStorage');await migration.close();
-  for(const [url,lang] of [['/de/rechnung/','de'],['/es/factura/','es']]){const cc=await browser.newContext();const pp=await cc.newPage();await load(pp,url);assert(await pp.locator('#private-library > summary').innerText());assert.equal(await pp.locator('script[src*="cloudflare"]').count(),0);await cc.close();}ok('DE and ES editors mount translated library without third-party scripts');
+  for(const [url,lang] of [['/de/rechnung/','de'],['/es/factura/','es']]){const cc=await browser.newContext();const pp=await cc.newPage();await load(pp,url);pp.on('dialog',d=>d.accept());await pp.locator('#rememberMe').uncheck();await pp.waitForFunction(()=>!document.querySelector('#rememberMe').disabled);await checkOffCopy(pp);assert(await pp.locator('#private-library > summary').innerText());assert.equal(await pp.locator('script[src*="cloudflare"]').count(),0);await cc.close();}ok('DE and ES editors mount translated library without third-party scripts');
   await p.setViewportSize({width:390,height:844});assert(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));ok('mobile library fits viewport');
   assert.deepEqual(errors,[]);assert.deepEqual(external,[]);ok('no page errors or external requests');
   console.log(`${checks} browser checks passed`);

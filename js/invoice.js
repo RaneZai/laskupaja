@@ -29,8 +29,10 @@
     fi: {
       'inv.title': 'Laskun laatija',
       'inv.lead': 'Täytä tiedot, tarkista yhteenveto ja tulosta lasku A4-PDF:nä. Luonnos tallentuu automaattisesti selaimeen.',
+      'inv.leadOff': 'Täytä tiedot, tarkista yhteenveto ja tulosta lasku A4-PDF:nä. Tietoja ei tallenneta, kun muistaminen on pois päältä.',
       'inv.myDetails': 'Omat tiedot – laskuttaja',
       'inv.myDetailsHint': 'Nämä tiedot tallennetaan selaimen muistiin ja esitäytetään tuleviin laskuihin.',
+      'inv.myDetailsHintOff': 'Näitä tietoja käytetään vain tässä avoimessa laskussa. Niitä ei tallenneta tulevia laskuja varten.',
       'inv.senderName': 'Nimi tai yritys *',
       'inv.namePh': 'esim. Matti Meikäläinen / Meikäläinen Oy',
       'inv.senderBid': 'Y-tunnus',
@@ -128,8 +130,10 @@
     en: {
       'inv.title': 'Invoice generator',
       'inv.lead': 'Fill in the details, check the summary and print the invoice as an A4 PDF. The draft autosaves in your browser.',
+      'inv.leadOff': 'Fill in the details, check the summary and print the invoice as an A4 PDF. Nothing is saved while remembering is off.',
       'inv.myDetails': 'My details – seller',
       'inv.myDetailsHint': 'These details are saved in your browser and prefilled into future invoices.',
+      'inv.myDetailsHintOff': 'These details are used only in this open invoice. They are not saved for future invoices.',
       'inv.senderName': 'Name or company *',
       'inv.namePh': 'e.g. Jane Doe / Doe Ltd',
       'inv.senderBid': 'Business ID / VAT number',
@@ -227,8 +231,10 @@
     es: {
       'inv.title': 'Generador de facturas',
       'inv.lead': 'Rellena los datos, revisa el resumen e imprime la factura como PDF A4. El borrador se guarda automáticamente en tu navegador.',
+      'inv.leadOff': 'Rellena los datos, revisa el resumen e imprime la factura como PDF A4. No se guarda nada mientras el guardado esté desactivado.',
       'inv.myDetails': 'Mis datos – emisor',
       'inv.myDetailsHint': 'Estos datos se guardan en tu navegador y se rellenan automáticamente en futuras facturas.',
+      'inv.myDetailsHintOff': 'Estos datos se usan solo en esta factura abierta. No se guardan para futuras facturas.',
       'inv.senderName': 'Nombre o empresa *',
       'inv.namePh': 'p. ej. María García / García S.L.',
       'inv.senderBid': 'NIF/CIF o n.º IVA intracomunitario',
@@ -326,8 +332,10 @@
     de: {
       'inv.title': 'Rechnung erstellen',
       'inv.lead': 'Daten ausfüllen, Zusammenfassung prüfen und die Rechnung als A4-PDF drucken. Der Entwurf wird automatisch im Browser gespeichert.',
+      'inv.leadOff': 'Daten ausfüllen, Zusammenfassung prüfen und die Rechnung als A4-PDF drucken. Wenn das Merken ausgeschaltet ist, wird nichts gespeichert.',
       'inv.myDetails': 'Meine Daten – Leistender',
       'inv.myDetailsHint': 'Diese Daten werden in deinem Browser gespeichert und bei künftigen Rechnungen vorbefüllt.',
+      'inv.myDetailsHintOff': 'Diese Daten werden nur in dieser geöffneten Rechnung verwendet. Sie werden nicht für künftige Rechnungen gespeichert.',
       'inv.senderName': 'Name oder Firma *',
       'inv.namePh': 'z. B. Max Mustermann / Mustermann GmbH',
       'inv.senderBid': 'Steuernummer / USt-IdNr.',
@@ -558,6 +566,15 @@
     $('#rememberMe').checked = on;
     const box = $('#storage-box');
     if (box) box.classList.toggle('off', !on);
+    for (const base of ['inv.lead', 'inv.myDetailsHint']) {
+      const el = document.querySelector(`[data-i18n="${base}"], [data-i18n="${base}Off"]`);
+      if (el) {
+        const key = on ? base : base + 'Off';
+        el.setAttribute('data-i18n', key);
+        el.textContent = t(key);
+      }
+    }
+    $('#autosave-note').setAttribute('data-i18n', on ? 'inv.autosave' : 'inv.storageOff');
     setStorageStatus(on ? '' : t('inv.storageOff'));
     if (!on) $('#autosave-note').textContent = t('inv.storageOff');
   }

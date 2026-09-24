@@ -193,7 +193,7 @@
  async function saveWorking(working){ensure();return enqueue(async()=>{ensure();await store.edit(s=>{s.working[market]=working;return s;});changed();});}
  async function clear(on){
   clearTimeout(timer);generation++;enabled=false;password=null;backup=null;archive=null;backupError=false;await serial;
-  await store.clear();adapter.removeLegacy();blocked=false;ready=true;notice.textContent='';enabled=on;channel?.postMessage({cleared:true,enabled:on});renderList();renderStatus();
+  await store.clear();promptBox.hidden=true;$('#library-save-status').textContent='';adapter.removeLegacy();blocked=false;ready=true;notice.textContent='';enabled=on;channel?.postMessage({cleared:true,enabled:on});renderList();renderStatus();
  }
  if(channel)channel.onmessage=()=>{if(ready){blocked=true;blockReason='conflict';generation++;clearTimeout(timer);password=null;notice.textContent=T('conflict');renderStatus();}};
  document.addEventListener('lp:langchange',()=>{if(adapter)mount();});
