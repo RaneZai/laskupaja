@@ -2,7 +2,9 @@
 
 The FI, DE and ES invoice editors share one device-local IndexedDB library. Each country has its own working draft. Customer records can be used across the editors; products, named business profiles and saved invoice copies retain their country context. The interface is available in Finnish, English, German and Spanish.
 
-Customers include contact and billing details and payment terms. Products/services include a description, unit, price, VAT default and whether that price includes VAT. Business profiles include sender details, IBAN and payment/VAT defaults. Catalog selections fill the editable invoice. Saved invoices contain independent copies of the details and line items. Opening one makes a working copy; duplicating one generates a new number and dates. Neither operation changes the stored snapshot. Different VAT-inclusive price modes require an explicit user correction before inserting a product.
+Customers include contact and billing details and payment terms. Products/services include a product name, optional description, unit, price, VAT default and whether that price includes VAT. Business profiles include sender details, IBAN and payment/VAT defaults. Catalog selections fill the editable invoice. Product names and descriptions are combined in the invoice line; older products without a separate name remain usable. Saved invoices contain independent copies of the details and line items. Opening one makes a working copy; duplicating one generates a new number and dates. Neither operation changes the stored snapshot. Different VAT-inclusive price modes require an explicit user correction before inserting a product.
+
+The library is a native collapsible panel, closed by default. Storage and backup status remain visible outside it. Save invoice is in the final action row beside print and new invoice, with local success/error feedback.
 
 ## Persistence
 

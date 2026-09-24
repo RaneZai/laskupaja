@@ -1014,7 +1014,7 @@
         if(type==='products') {
           if(data.pricesIncl!==$('#pricesInclVat').checked)throw Error('mismatch');
           const rows=$$('#items-body .item-row');if(rows.length===1&&!rowValues(rows[0]).desc&&!rowValues(rows[0]).price)rows[0].remove();
-          addRow({...data,qty:1});
+          addRow({...data,desc:[data.name,data.desc].filter(Boolean).join(': '),qty:1});
         }
         renderAll();saveDraft();
       }

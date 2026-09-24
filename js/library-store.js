@@ -36,7 +36,7 @@
         if (type === 'invoices') draft(r.data);
         if (type === 'customers') ['name','bid','address','email','terms'].forEach(k => text(r.data[k]));
         if (type === 'profiles') ['name','bid','address','iban','defaultTerms','defaultVat'].forEach(k => { if (!['string','number'].includes(typeof r.data[k])) fail('invalid'); });
-        if (type === 'products') { ['desc','unit','price','vat'].forEach(k => text(r.data[k])); if (typeof r.data.pricesIncl !== 'boolean' || !Number.isFinite(Number(r.data.price.replace(',','.'))) || !Number.isFinite(Number(r.data.vat))) fail('invalid'); }
+        if (type === 'products') { if(r.data.name!==undefined)text(r.data.name,200); ['desc','unit','price','vat'].forEach(k => text(r.data[k])); if (typeof r.data.pricesIncl !== 'boolean' || !Number.isFinite(Number(r.data.price.replace(',','.'))) || !Number.isFinite(Number(r.data.vat))) fail('invalid'); }
       }
     }
     return s;
