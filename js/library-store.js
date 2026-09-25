@@ -26,7 +26,7 @@
     plain(s); safe(s);
     if (s.schema !== VERSION || !Number.isSafeInteger(s.revision) || s.revision < 0) fail('invalid');
     text(s.id, 100); text(s.updated, 100); plain(s.working);
-    for (const [market,w] of Object.entries(s.working)) { if (!['FI','DE','ES'].includes(market)) fail('invalid'); plain(w); draft(w.draft); plain(w.profile); text(w.lastNo); if(w.invoiceId!=null)text(w.invoiceId,100); }
+    for (const [market,w] of Object.entries(s.working)) { if (!['FI','DE','ES'].includes(market)) fail('invalid'); plain(w); draft(w.draft); plain(w.profile); text(w.lastNo); if(w.invoiceId!=null)text(w.invoiceId,100);if(w.selected!==undefined){plain(w.selected);for(const type of ['customers','profiles'])if(w.selected[type]!=null)text(w.selected[type],100);} }
     for (const type of GROUPS) {
       if (!Array.isArray(s[type]) || s[type].length > 5000) fail('invalid');
       const ids = new Set();

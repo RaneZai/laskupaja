@@ -1,6 +1,15 @@
 /* FI / EN / DE / ES copy for the private library. */
 (function(){
  const rows={
+ draftSaved:["Luonnos tallennettu tähän selaimeen", "Draft saved in this browser", "Entwurf in diesem Browser gespeichert", "Borrador guardado en este navegador"],
+ invoiceSaved:["Lasku tallennettu kirjastoon", "Invoice saved to library", "Rechnung in Bibliothek gespeichert", "Factura guardada en la biblioteca"],
+ pendingInvoice:["Laskussa on muutoksia. Päivitä se kirjastoon tallennuspainikkeesta.", "Invoice changes are pending. Use the save button to update the library.", "Die Rechnung wurde geändert. Speichern Sie sie, um die Bibliothek zu aktualisieren.", "Hay cambios en la factura. Usa el botón de guardar para actualizar la biblioteca."],
+ updateCustomer:["Päivitä asiakkaan tiedot", "Update customer details", "Kundendaten aktualisieren", "Actualizar datos del cliente"],
+ updateProfile:["Päivitä yritystiedot", "Update business details", "Firmendaten aktualisieren", "Actualizar datos de la empresa"],
+ saveAsNew:["Tallenna uutena", "Save as new", "Als neuen Eintrag speichern", "Guardar como nuevo"],
+ updatedRecord:["Tiedot päivitetty", "Details updated", "Daten aktualisiert", "Datos actualizados"],
+ recordDeleted:["Tietue poistettu", "Record deleted", "Eintrag gelöscht", "Registro eliminado"],
+
  emptyCategory:["Tässä ryhmässä ei ole vielä tietoja.", "No records in this category yet.", "In dieser Kategorie gibt es noch keine Einträge.", "Aún no hay registros en esta categoría."],
  noResults:["Hakua vastaavia tietoja ei löytynyt.", "No matching records.", "Keine passenden Einträge gefunden.", "No se encontraron registros."],
  chooseCustomer:["Valitse tallennettu asiakas", "Choose saved customer", "Gespeicherten Kunden wählen", "Elegir cliente guardado"],

@@ -849,6 +849,7 @@
 
   let saveTimer = null, saveCounter = 0, pendingDraft = false;
   function scheduleSave() {
+    Library.edited();
     pendingDraft = true;
     clearTimeout(saveTimer);
     saveTimer = setTimeout(saveDraft, 350);
@@ -867,7 +868,7 @@
       if (epoch !== persistenceEpoch) return;
       working = next;
       if(request===saveCounter && !saveTimer)pendingDraft=false;
-      $('#autosave-note').textContent = Library.T('saved') + ' ' + new Date().toLocaleTimeString(LOCALES[LP.i18n.getLang()], {hour:'2-digit',minute:'2-digit'});
+      $('#autosave-note').textContent = Library.T('draftSaved') + ' ' + new Date().toLocaleTimeString(LOCALES[LP.i18n.getLang()], {hour:'2-digit',minute:'2-digit'});
     } catch(e) { if (epoch === persistenceEpoch) { $('#autosave-note').textContent = Library.T('error'); Library.showError(e); } }
   }
 
@@ -998,6 +999,7 @@
       clearTimeout(saveTimer);saveTimer=null;pendingDraft=false; persistenceEpoch++;
       working = w || null;
       Library.setActive(w?.invoiceId || null);
+      Library.restoreSelection(w?.selected);
       $('#invoice-form').reset();
       $('#items-body').replaceChildren();
       if (w) { applyProfile(w.profile); applyDraft(w.draft); }
@@ -1010,6 +1012,7 @@
     }
     working = await Library.init({
       remember:rememberOn, collect:collectForm, profile:collectProfile,
+      validate:()=>$('#invoice-form').reportValidity(),
       total:d=>fmtMoney(computeTotals(d.items.map(it=>({...it,qty:parseNum(it.qty),price:parseNum(it.price),vat:parseNum(it.vat)})),d.pricesIncl).grossC),
       totalCents:d=>computeTotals(d.items.map(it=>({...it,qty:parseNum(it.qty),price:parseNum(it.price),vat:parseNum(it.vat)})),d.pricesIncl).grossC,
       defaultVat, rates:()=>vatOptions().map(o=>o.value),
@@ -1036,7 +1039,7 @@
           const rows=$$('#items-body .item-row');if(rows.length===1&&!rowValues(rows[0]).desc&&!rowValues(rows[0]).price)rows[0].remove();
           addRow({...data,desc:[data.name,data.desc].filter(Boolean).join(': '),qty:1});
         }
-        renderAll();saveDraft();
+        Library.edited();renderAll();saveDraft();
       }
     });
     /* default or restored state */
@@ -1099,7 +1102,7 @@
     });
 
     /* rows */
-    $('#add-row').addEventListener('click', () => { addRow(); saveDraft(); });
+    $('#add-row').addEventListener('click', () => { addRow();Library.edited(); saveDraft(); });
     $('#items-body').addEventListener('click', (e) => {
       const btn = e.target.closest('.remove-row');
       if (!btn) return;
@@ -1111,7 +1114,7 @@
       } else {
         tr.remove();
       }
-      renderTotals();
+      Library.edited();renderTotals();
       saveDraft();
     });
 
@@ -1131,8 +1134,8 @@
 
     /* new invoice: keep the business profile, clear per-invoice fields */
     $('#new-invoice-btn').addEventListener('click', () => {
-      if (!window.confirm(t('inv.confirmNew'))) return;
-      Library.setActive(null);
+      if (Library.busy || !window.confirm(t('inv.confirmNew'))) return;
+      Library.setActive(null,true);
       const profile = collectProfile(); /* snapshot before form.reset() */
       /* When remembering is off there is no stored last number, so the
        * on-screen number is the increment base. */

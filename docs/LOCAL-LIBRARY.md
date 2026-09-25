@@ -38,11 +38,17 @@ There is no account, remote database or cloud synchronization. Signing into Chro
 
 ## Invoice identity and history
 
-Saved invoices keep their UUID when updated. The working draft stores an optional `invoiceId`; it survives reload and backup replacement. Starting a new invoice, duplicating, deleting the linked record or clearing local data removes that link. Saving commits the invoice data and its working draft together. A failed save cannot advance the active identity or discard an older version. Previous versions can be opened as a draft and explicitly saved back to the same invoice. Existing backup records without history/status remain supported; no old invoice copies are silently consolidated.
+Saved invoices keep their UUID when updated. The working draft stores an optional `invoiceId`; it survives reload and backup replacement. Starting a new invoice, duplicating, deleting the linked record or clearing local data removes that link. Saving commits the invoice data and its working draft together. A failed save cannot advance the active identity or discard an older version. Invoice saves capture their target ID before asynchronous work and lock the form/library until completion; queued draft writes likewise capture their identity. Explicit invoice saves enforce the form constraints and focus invalid fields; incomplete working drafts can still autosave. Previous versions can be opened as a draft and explicitly saved back to the same invoice. Existing backup records without history/status remain supported; no old invoice copies are silently consolidated.
 
 Invoice records optionally include `history` (prior data and timestamp) and `status` (`paid` or `unpaid`, defaulting to unpaid for old records). Status is manual; dates never imply payment. Editing invoice data keeps its status; a new duplicate starts unpaid. History is included in encrypted backups and retained on merge conflicts. There is no automatic history pruning; existing overall record/archive size limits still apply. Deleting an invoice deletes its versions too, with an explicit confirmation.
 
 Library rows show invoice totals using the same cent-rounding calculation as the invoice, due dates and payment status. Sorting offers newest/oldest and, for invoices, earliest due date or highest total. Date searches accept displayed local dates as well as ISO dates. Empty categories and searches display an explanation.
+
+## Save feedback, record selection and keyboard use
+
+Draft autosave and explicit invoice saves use distinct messages. Editing fields, selecting saved data or changing line items clears the prior invoice confirmation and indicates that an existing invoice needs updating. Customer/business selections are retained in the working draft. Their inline Save buttons become Update buttons after selection or initial save; the update dialog includes an explicit “Save as new” checkbox. Changes made in that dialog also populate the current invoice form. Same-name picker entries include business ID/address and, when still identical, a short record identifier. Existing duplicates are not merged automatically.
+
+Starting a new invoice retains the selected business but clears the customer. Opening another saved invoice clears these selections; restoring/reloading a working draft restores valid selection IDs. Payment-status actions retain focus on the corresponding action. Deletion focuses the next available record, or the category selector when no records remain, and announces the result locally.
 
 ## Verification
 
@@ -58,6 +64,7 @@ NODE_PATH=/home/rauno/laskupaja-ops/tools/browser/node_modules node tests/librar
 NODE_PATH=/home/rauno/laskupaja-ops/tools/browser/node_modules node tests/library-backup.browser.cjs
 NODE_PATH=/home/rauno/laskupaja-ops/tools/browser/node_modules node tests/library-recovery.browser.cjs
 NODE_PATH=/home/rauno/laskupaja-ops/tools/browser/node_modules node tests/library-features.browser.cjs
+NODE_PATH=/home/rauno/laskupaja-ops/tools/browser/node_modules node tests/library-regressions.browser.cjs
 ```
 
 Browser tests run isolated localhost servers, temporary Chromium profiles and synthetic records. Device-file tests use real browser file streams, with the picker and permissions controlled by the test. Tests cover encryption/tampering, migration, duplication, snapshots, import merge, fresh-context restore, stale tabs, unavailable storage, opt-out, local save failures, historical rates, backup rotation, reconnect and failed/interrupted writes. The fallback is simulated in Chromium; Safari/Firefox and native operating-system picker interactions require separate manual validation.

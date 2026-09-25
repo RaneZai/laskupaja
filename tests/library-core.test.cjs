@@ -20,8 +20,9 @@ test('merge preserves differing records and does not mutate either input',()=>{
 });
 test('invoice versions and status survive encrypted backup and conflict merge',async()=>{
  const data={sender:{name:'Company',bid:'',address:'Street\nCity',iban:''},client:{name:'Customer',bid:'',address:'Street\nCity'},meta:{number:'2026-001',date:'2026-09-25',due:'2026-10-09',terms:'14'},notes:'',items:[{desc:'Service',unit:'h',qty:1,price:100,vat:'25.5'}],pricesIncl:false,reverseCharge:false};
- const s=C.empty(),id=C.uid();s.invoices.push({id,name:'2026-001',market:'FI',updated:'2026-09-25T12:00:00Z',data:C.copy(data),status:'paid',history:[{updated:'2026-09-25T11:00:00Z',data:C.copy(data)}]});s.invoices[0].data.items[0].price=150;s.working.FI={draft:C.copy(data),profile:{},lastNo:'2026-001',invoiceId:id};
+ const s=C.empty(),id=C.uid();s.invoices.push({id,name:'2026-001',market:'FI',updated:'2026-09-25T12:00:00Z',data:C.copy(data),status:'paid',history:[{updated:'2026-09-25T11:00:00Z',data:C.copy(data)}]});s.invoices[0].data.items[0].price=150;s.working.FI={draft:C.copy(data),profile:{},lastNo:'2026-001',invoiceId:id,selected:{customers:null,profiles:null}};
  const a={format:'laskupaja-archive',version:1,snapshots:[s]},pw='a safe test password';assert.deepEqual(await C.decrypt(await C.encrypt(a,pw),pw),a);
  const incoming=C.copy(s);incoming.invoices[0].data.items[0].price=200;const merged=C.merge(s,incoming);assert.equal(merged.conflicts,1);assert.equal(merged.state.invoices[1].history[0].data.items[0].price,100);assert.equal(merged.state.working.FI.invoiceId,id);
+ const selectionBad=C.copy(s);selectionBad.working.FI.selected.customers={bad:true};assert.throws(()=>C.validate(selectionBad));
  const bad=C.copy(s);bad.invoices[0].status='anything';assert.throws(()=>C.validate(bad));bad.invoices[0].status='paid';bad.invoices[0].history[0].data.items[0].price='broken';assert.throws(()=>C.validate(bad));
 });
