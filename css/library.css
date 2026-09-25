@@ -23,3 +23,11 @@
 .private-library[open] > summary { margin-bottom: 1rem; }
 #library-storage-status p { margin: .5rem 0; }
 #library-save-status { flex-basis: 100%; }
+
+.library-picker { display:flex;flex-direction:column;gap:.35rem;margin:.75rem 0;max-width:100%;font-size:.88rem; }
+.library-picker select { width:100%;min-width:0;padding:.5rem;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:#172033; }
+.library-dialog textarea { width:100%;min-width:0;padding:.6rem;border:1px solid #94a3b8;border-radius:6px;font:inherit; }
+.library-filters { grid-template-columns:1fr 2fr 1fr; }
+.library-record > div { min-width:0; }
+.library-record > .library-actions { flex-shrink:0;max-width:60%; }
+@media(max-width:600px){.library-filters{grid-template-columns:1fr}.library-record > .library-actions{max-width:100%}}

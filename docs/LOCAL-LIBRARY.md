@@ -2,7 +2,7 @@
 
 The FI, DE and ES invoice editors share one device-local IndexedDB library. Each country has its own working draft. Customer records can be used across the editors; products, named business profiles and saved invoice copies retain their country context. The interface is available in Finnish, English, German and Spanish.
 
-Customers include contact and billing details and payment terms. Products/services include a product name, optional description, unit, price, VAT default and whether that price includes VAT. Business profiles include sender details, IBAN and payment/VAT defaults. Catalog selections fill the editable invoice. Product names and descriptions are combined in the invoice line; older products without a separate name remain usable. Saved invoices contain independent copies of the details and line items. Opening one makes a working copy; duplicating one generates a new number and dates. Neither operation changes the stored snapshot. Different VAT-inclusive price modes require an explicit user correction before inserting a product.
+Customers include contact and billing details and payment terms. Products/services include a product name, optional description, unit, price, VAT default and whether that price includes VAT. Business profiles include sender details, IBAN and payment/VAT defaults. Catalog selections fill the editable invoice, using either the library list or the selectors beside business/customer fields and invoice rows. Addresses retain line breaks. Library payment terms are limited to whole days from 0 to 365; VAT entry accepts decimal commas and normalizes the value before checking the country rates. Product names and descriptions are combined in the invoice line; older products without a separate name remain usable. Saved invoices contain independent copies of the details and line items. Opening one makes a working copy linked to that invoice. Saving updates the same record and retains the previous data in its version history; saving unchanged data adds no version. Duplicating starts an unlinked draft with a new number and dates, and its first save creates a new unpaid invoice. Opening or duplicating alone does not change saved invoice data. An invoice number already used by another record on the same country page is rejected on save. Different VAT-inclusive price modes require an explicit user correction before inserting a product.
 
 The library is a native collapsible panel, closed by default. Storage and backup status remain visible outside it. Save invoice is in the final action row beside print and new invoice, with local success/error feedback.
 
@@ -36,6 +36,14 @@ All three invoice editors load first-party scripts only. Their CSP blocks outgoi
 
 There is no account, remote database or cloud synchronization. Signing into Chrome on another device does not restore the library. A random library ID is not a hardware identifier. Future paid sync needs a separate recovery, conflict and security design. No paid service or dependency was introduced.
 
+## Invoice identity and history
+
+Saved invoices keep their UUID when updated. The working draft stores an optional `invoiceId`; it survives reload and backup replacement. Starting a new invoice, duplicating, deleting the linked record or clearing local data removes that link. Saving commits the invoice data and its working draft together. A failed save cannot advance the active identity or discard an older version. Previous versions can be opened as a draft and explicitly saved back to the same invoice. Existing backup records without history/status remain supported; no old invoice copies are silently consolidated.
+
+Invoice records optionally include `history` (prior data and timestamp) and `status` (`paid` or `unpaid`, defaulting to unpaid for old records). Status is manual; dates never imply payment. Editing invoice data keeps its status; a new duplicate starts unpaid. History is included in encrypted backups and retained on merge conflicts. There is no automatic history pruning; existing overall record/archive size limits still apply. Deleting an invoice deletes its versions too, with an explicit confirmation.
+
+Library rows show invoice totals using the same cent-rounding calculation as the invoice, due dates and payment status. Sorting offers newest/oldest and, for invoices, earliest due date or highest total. Date searches accept displayed local dates as well as ISO dates. Empty categories and searches display an explanation.
+
 ## Verification
 
 From the site checkout:
@@ -49,6 +57,7 @@ node --test tests/library-core.test.cjs
 NODE_PATH=/home/rauno/laskupaja-ops/tools/browser/node_modules node tests/library.browser.cjs
 NODE_PATH=/home/rauno/laskupaja-ops/tools/browser/node_modules node tests/library-backup.browser.cjs
 NODE_PATH=/home/rauno/laskupaja-ops/tools/browser/node_modules node tests/library-recovery.browser.cjs
+NODE_PATH=/home/rauno/laskupaja-ops/tools/browser/node_modules node tests/library-features.browser.cjs
 ```
 
 Browser tests run isolated localhost servers, temporary Chromium profiles and synthetic records. Device-file tests use real browser file streams, with the picker and permissions controlled by the test. Tests cover encryption/tampering, migration, duplication, snapshots, import merge, fresh-context restore, stale tabs, unavailable storage, opt-out, local save failures, historical rates, backup rotation, reconnect and failed/interrupted writes. The fallback is simulated in Chromium; Safari/Firefox and native operating-system picker interactions require separate manual validation.

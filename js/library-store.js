@@ -26,14 +26,21 @@
     plain(s); safe(s);
     if (s.schema !== VERSION || !Number.isSafeInteger(s.revision) || s.revision < 0) fail('invalid');
     text(s.id, 100); text(s.updated, 100); plain(s.working);
-    for (const [market,w] of Object.entries(s.working)) { if (!['FI','DE','ES'].includes(market)) fail('invalid'); plain(w); draft(w.draft); plain(w.profile); text(w.lastNo); }
+    for (const [market,w] of Object.entries(s.working)) { if (!['FI','DE','ES'].includes(market)) fail('invalid'); plain(w); draft(w.draft); plain(w.profile); text(w.lastNo); if(w.invoiceId!=null)text(w.invoiceId,100); }
     for (const type of GROUPS) {
       if (!Array.isArray(s[type]) || s[type].length > 5000) fail('invalid');
       const ids = new Set();
       for (const r of s[type]) {
         plain(r); text(r.id,100); if (ids.has(r.id)) fail('invalid'); ids.add(r.id);
         text(r.name,200); text(r.updated,100); if (!['FI','DE','ES'].includes(r.market)) fail('invalid'); plain(r.data);
-        if (type === 'invoices') draft(r.data);
+        if (type === 'invoices') {
+          draft(r.data);
+          if(r.status!==undefined && !['paid','unpaid'].includes(r.status))fail('invalid');
+          if(r.history!==undefined){
+            if(!Array.isArray(r.history))fail('invalid');
+            for(const v of r.history){plain(v);text(v.updated,100);draft(v.data);}
+          }
+        }
         if (type === 'customers') ['name','bid','address','email','terms'].forEach(k => text(r.data[k]));
         if (type === 'profiles') ['name','bid','address','iban','defaultTerms','defaultVat'].forEach(k => { if (!['string','number'].includes(typeof r.data[k])) fail('invalid'); });
         if (type === 'products') { if(r.data.name!==undefined)text(r.data.name,200); ['desc','unit','price','vat'].forEach(k => text(r.data[k])); if (typeof r.data.pricesIncl !== 'boolean' || !Number.isFinite(Number(r.data.price.replace(',','.'))) || !Number.isFinite(Number(r.data.vat))) fail('invalid'); }

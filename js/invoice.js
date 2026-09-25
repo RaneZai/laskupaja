@@ -997,6 +997,7 @@
     function reloadWorking(w) {
       clearTimeout(saveTimer);saveTimer=null;pendingDraft=false; persistenceEpoch++;
       working = w || null;
+      Library.setActive(w?.invoiceId || null);
       $('#invoice-form').reset();
       $('#items-body').replaceChildren();
       if (w) { applyProfile(w.profile); applyDraft(w.draft); }
@@ -1009,6 +1010,8 @@
     }
     working = await Library.init({
       remember:rememberOn, collect:collectForm, profile:collectProfile,
+      total:d=>fmtMoney(computeTotals(d.items.map(it=>({...it,qty:parseNum(it.qty),price:parseNum(it.price),vat:parseNum(it.vat)})),d.pricesIncl).grossC),
+      totalCents:d=>computeTotals(d.items.map(it=>({...it,qty:parseNum(it.qty),price:parseNum(it.price),vat:parseNum(it.vat)})),d.pricesIncl).grossC,
       defaultVat, rates:()=>vatOptions().map(o=>o.value),
       removeLegacy:()=>LS_DATA_KEYS.forEach(k=>{ try { localStorage.removeItem(k); } catch(e) {} }),
       legacy:()=>{
@@ -1129,6 +1132,7 @@
     /* new invoice: keep the business profile, clear per-invoice fields */
     $('#new-invoice-btn').addEventListener('click', () => {
       if (!window.confirm(t('inv.confirmNew'))) return;
+      Library.setActive(null);
       const profile = collectProfile(); /* snapshot before form.reset() */
       /* When remembering is off there is no stored last number, so the
        * on-screen number is the increment base. */
